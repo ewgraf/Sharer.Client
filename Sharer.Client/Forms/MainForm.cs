@@ -101,11 +101,15 @@ namespace Sharer.Client {
 				(this.notifyIcon1.ContextMenuStrip.Items["History"] as ToolStripMenuItem).Text = ContextMenuItems.History;
 			};
 			uploadFinished = () => {
-				this.notifyIcon1.ContextMenuStrip.Invoke(new Action(() => {
-					(this.notifyIcon1.ContextMenuStrip.Items["History"] as ToolStripMenuItem).Text = ContextMenuItems.History;
-					(this.notifyIcon1.ContextMenuStrip.Items["History"] as ToolStripMenuItem).DropDownItems.Clear();
-					(this.notifyIcon1.ContextMenuStrip.Items["History"] as ToolStripMenuItem).DropDownItems.AddRange(_history.HistoryItems);
-				}));
+				try {
+					this.notifyIcon1.ContextMenuStrip.Invoke(new Action(() => {
+						(this.notifyIcon1.ContextMenuStrip.Items["History"] as ToolStripMenuItem).Text = ContextMenuItems.History;
+						(this.notifyIcon1.ContextMenuStrip.Items["History"] as ToolStripMenuItem).DropDownItems.Clear();
+						(this.notifyIcon1.ContextMenuStrip.Items["History"] as ToolStripMenuItem).DropDownItems.AddRange(_history.HistoryItems);
+					}));
+				} catch {
+					;
+				}
 			};
 			//_showProgress = (string text) => {
 			//	//Task.Run(() => {
