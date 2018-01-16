@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 class InterceptKeys {
@@ -10,8 +9,8 @@ class InterceptKeys {
     private const int WM_KEYDOWN = 0x0100;
     private static LowLevelKeyboardProc _proc = HookCallback;
     private static IntPtr _hookID = IntPtr.Zero;
-    private static Func<CancellationToken, Task> CtrlShiftD2OuterCallback; // @
-    private static Func<CancellationToken, Task> CtrlShiftD3OuterCallback; // #
+    private static Action<CancellationToken> CtrlShiftD2OuterCallback;   // @
+    private static Action<CancellationToken> CtrlShiftD3OuterCallback;   // #
     private static Action<CancellationToken> CtrlShiftD6OuterCallback; // ^
 
     // Specifies the type of hook procedure to be installed
@@ -36,7 +35,7 @@ class InterceptKeys {
 
 	private static CancellationToken _token;
 
-	public static void SetHooks(Func<CancellationToken, Task> act0, Func<CancellationToken, Task> act1, Action<CancellationToken> act2, CancellationToken token) {
+	public static void SetHooks(Action<CancellationToken> act0, Action<CancellationToken> act1, Action<CancellationToken> act2, CancellationToken token) {
         _hookID = SetHook(_proc);
         CtrlShiftD2OuterCallback = act0;
         CtrlShiftD3OuterCallback = act1;

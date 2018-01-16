@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -14,18 +13,18 @@ using Windows.UI.Notifications;
 
 namespace Sharer.Client {
 	public partial class MainForm : Form {
-		private List<Image> frames = new List<Image>();
-		private AreaSelectionForm selectionForm;
+		private static Mutex _mutex;
 		private Account _account;
+		private AreaSelectionForm _selectionForm;
 		private OpenWithListener _openWithListener;
 		private string _openWithSharerFileUploadPath;
 		public string lastLink;
-		public ToastNotification toast;
 		private UploadHistory _history = new UploadHistory();
-		private static Mutex _mutex;
 		private readonly Action _contextMenuUploadCancelled;
 		private readonly Action _contextMenuUploadFinished;
 		private CancellationTokenSource _uploadCancellationTokenSource;
+
+		private readonly Icon _icon;
 
 		private class ContextMenuItems {
 			public const string Account = "Account";
@@ -55,6 +54,7 @@ namespace Sharer.Client {
 			}));
 
 			InitializeComponent();
+			_icon = this.notifyIcon1.Icon;
 			SetupCheckBoxEditBeforeUpload();
 
 			this.notifyIcon1.ContextMenuStrip = BuildContextMenuStrip();
@@ -145,23 +145,6 @@ namespace Sharer.Client {
 			}
 
 			InitKeyHooks();
-			//RecordOneSecond60Frames();
-
-			//int width = frames[0].Width;
-			//int height = frames[0].Height;zz
-			//// create instance of video writer
-			//VideoFileWriter writer = new VideoFileWriter();
-			//// create new video file
-			//writer.Open(@"D:\frames\out.webm", width, height, 60, VideoCodec.Default);
-			//foreach (var f in frames)
-			//{
-			//    writer.WriteVideoFrame((Bitmap)f);
-			//}
-			//writer.Close();
-			//writer.Dispose();
-			//frames.Clear();
-			////int i = 0;
-			////frames.ForEach(n => n.Save(string.Format(@"D:\frames\{0:00}.png", i++), System.Drawing.Imaging.ImageFormat.Png));
 		}
 
 		private bool Auth() {
@@ -178,7 +161,11 @@ namespace Sharer.Client {
 			RunSTATask(() => {
 				Clipboard.SetText(link);
 			});
-			Toast(link, filePath);
+			ToastHelper.ShowToast(link, filePath, (s, a) => {
+				if (link != null) {
+					Process.Start(link);
+				}
+			});
 		}
 
 		private Image TryOpenImage(string path) {
@@ -200,7 +187,9 @@ namespace Sharer.Client {
 			}
 
 			try {
-				Cursor.Current = Cursors.WaitCursor;
+				string size = new FileInfo(filePath).Length.ToInformationPrefixString();
+				StartDisplayProgress(size);
+
 				if (string.IsNullOrEmpty(filePath)) {
 					throw new ArgumentOutOfRangeException(nameof(filePath));
 				}
@@ -231,50 +220,11 @@ namespace Sharer.Client {
 				MessageBox.Show(ex.Message, $"Failed to upload");
 				return;
 			} finally {
-				Cursor.Current = Cursors.Default;
+				StopDisplayProgress();
 			}
 		}
-
-		public void Toast(string link, string imagePath)
-		{
-			XmlDocument toastXml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastImageAndText03);
-			// Fill in the text elements
-			XmlNodeList stringElements = toastXml.GetElementsByTagName("text");
-			stringElements[0].AppendChild(toastXml.CreateTextNode("Uploaded at"));
-			stringElements[1].AppendChild(toastXml.CreateTextNode(link));
-
-			// Specify the absolute path to an image
-			XmlNodeList imageElements = toastXml.GetElementsByTagName("image");
-			imageElements[0].Attributes.GetNamedItem("src").NodeValue = "file:///" + imagePath;
-
-			// Create the toast and attach event listeners
-			toast = new ToastNotification(toastXml);
-			toast.Activated += Toast_Activated;
-			lastLink = link;
-
-			// Show the toast. Be sure to specify the AppUserModelId
-			// on your application's shortcut!
-			ToastNotificationManager.CreateToastNotifier("Sharer").Show(toast);
-		}
-
-		public void ShowToast(string title, string message)
-		{
-			XmlDocument toastXml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastImageAndText03);
-			XmlNodeList stringElements = toastXml.GetElementsByTagName("text");
-			stringElements[0].AppendChild(toastXml.CreateTextNode(title));
-			stringElements[1].AppendChild(toastXml.CreateTextNode(message));
-			ToastNotificationManager.CreateToastNotifier("Sharer").Show(new ToastNotification(toastXml));
-		}
-
-		public void Toast_Activated(ToastNotification sender, object args)
-		{
-			if (lastLink != null) {
-				Process.Start(lastLink);
-			}
-		}
-
-		public static Task RunSTATask(Action action)
-		{
+		
+		public static Task RunSTATask(Action action) {
 			var tcs = new TaskCompletionSource<Action>();
 			Thread thread = new Thread(() => {
 				try {
@@ -289,7 +239,7 @@ namespace Sharer.Client {
 		}
 
 		// покрыть тестом большим файлом
-		private async Task UploadImage(Image image, CancellationToken token) {
+		private void UploadImage(Image image, CancellationToken token) {
 			try {
 				Cursor.Current = Cursors.WaitCursor;
 				string path = Directory.GetParent(Sharer.LastUploadFile).FullName;
@@ -307,7 +257,7 @@ namespace Sharer.Client {
 				while (FileHelper.IsLocked(Sharer.LastUploadFile)) {
 					Thread.Sleep(5);
 				}
-				await UploadPath(Sharer.LastUploadFile, this, token);
+				Task.Run(() => UploadPath(Sharer.LastUploadFile, this, token));
 			} catch (Exception ex) {
 				MessageBox.Show($"at UploadImage {ex.ToString()}");
 			} finally {
@@ -324,68 +274,95 @@ namespace Sharer.Client {
 			);
 		}
 
-		private async Task CaptureArea(CancellationToken token) {
+		private void CaptureArea(CancellationToken token) {
 			try {
-				selectionForm.Close();
-				selectionForm = null;
+				_selectionForm.Close();
+				_selectionForm = null;
 			} catch {
 			}
-			selectionForm = new AreaSelectionForm();
-			var result = selectionForm.ShowDialog();
+			_selectionForm = new AreaSelectionForm();
+			var result = _selectionForm.ShowDialog();
 			if (result == DialogResult.Cancel) {
 				return;
 			}
 			if (result == DialogResult.OK) {
-				Rectangle selected = selectionForm.SelectedRectangle;
+				Rectangle selected = _selectionForm.SelectedRectangle;
 				if (selected == Rectangle.Empty) {
 					return;
 				}
-
-				//Image image = ScreenCaptureHelper.CaptureScreenRectangle(selected);
 				Image screenshot = ScreenCaptureHelper.CaptureScreen();
-				await EditAndUploadIfChecked(screenshot, selected, token);
+				EditAndUploadIfChecked(screenshot, selected, token);
 			}
 		}
 
-		private async Task CaptureScreen(CancellationToken token) {
+		private void CaptureScreen(CancellationToken token) {
 			Image image = ScreenCaptureHelper.CaptureScreen();
-			await UploadImage(image, token);
+			UploadImage(image, token);
 		}
 
-		private async Task EditAndUploadIfChecked(Image image, Rectangle area, CancellationToken token) {
+		private void EditAndUploadIfChecked(Image image, Rectangle area, CancellationToken token) {
 			if (checkBox_EditBeforeUpload.Checked) {
 				var edit = new EditCaptureForm(image, area);
 				if (edit.ShowDialog() == DialogResult.OK) {
-					await UploadImage(edit.Image, token);
+					UploadImage(edit.Image, token);
 				}
 			} else {
-				await UploadImage(image, token);
+				UploadImage(image, token);
 			}
 		}
+
+
+		private bool _uploading;
+
+		private Task StartDisplayProgress(string size) {
+			Cursor.Current = Cursors.WaitCursor;
+			return Task.Run(() => {
+				char[] progressChars = new[] { '—', '\\', '|', '/' };
+				int i = 0;
+				Font font38 = new Font("Courier New", 38);
+				Font font = new Font("Courier New", 20);
+				var rect = new Rectangle(0, 0, _icon.Width, _icon.Height);
+				var format = new StringFormat {
+					LineAlignment = StringAlignment.Center,
+					Alignment = StringAlignment.Center
+				};
+				_uploading = true;
+				while (_uploading) {
+					try {
+						this.notifyIcon1.ContextMenuStrip.Invoke(new Action<string>(UpdateProgress), new object[] { $"< Uploading {size} {progressChars[i]} >" });
+					} catch { }
+					
+					Bitmap icon = _icon.ToBitmap();
+					using (Graphics g = Graphics.FromImage(icon)) {
+						if (i == 2) {
+							g.DrawString(progressChars[i].ToString(), font38, Brushes.Black, rect, format);
+						} else {
+							g.DrawString(progressChars[i].ToString(), font, Brushes.Black, rect, format);
+						}
+					}
+					this.notifyIcon1.Icon = Icon.FromHandle(icon.GetHicon());
+					if (++i == progressChars.Length) {
+						i = 0;
+					}
+					Thread.Sleep(100);
+				}
+			});
+		}
+
+		private void StopDisplayProgress() {
+			Cursor.Current = Cursors.Default;
+			_uploading = false;
+			this.notifyIcon1.Icon = _icon;
+		}
+
 
 		private async void SelectAndUploadFiles(CancellationToken token) {
 			string[] selectedFiles = OpenSelectFilesDialog();
 			foreach (string filePath in selectedFiles) {
 				try {
-					bool uploading = true;
-					string size = new FileInfo(filePath).Length.ToInformationPrefixString();
-					Task.Run(() => {
-						char[] progressChars = new[] { '-', '\\', '|', '/' };
-						int i = 0;
-						while (uploading) {
-							//(this.notifyIcon1.ContextMenuStrip.Items["History"] as ToolStripMenuItem).Text = $"<Uploading {size} {progressChars[i++]}>";
-							this.notifyIcon1.ContextMenuStrip.Invoke(new Action<string>(UpdateProgress), new object[] { $"< Uploading {size} {progressChars[i++]} >" });
-							if (i == progressChars.Length) {
-								i = 0;
-							}
-							Thread.Sleep(100);
-						}
-					});
-					Task.Run(() => UploadPath(filePath, this, token)).ContinueWith(t => {
-						uploading = false;
-					});
+					Task.Run(() => UploadPath(filePath, this, token));
 				} catch(Exception ex) {
-					ShowToast($"Failed uploading file: '{filePath}'", ex.ToString());
+					ToastHelper.ShowToast($"Failed uploading file: '{filePath}'", ex.ToString());
 				}
 			}
 		}
@@ -410,8 +387,7 @@ namespace Sharer.Client {
 			}
 		}
 
-		private void Form1_Resize(object sender, EventArgs e)
-		{
+		private void Form1_Resize(object sender, EventArgs e) {
 			if (this.WindowState == FormWindowState.Minimized) {
 				this.Hide();
 			} else if (this.WindowState == FormWindowState.Normal) {
@@ -429,12 +405,9 @@ namespace Sharer.Client {
 			}
 		}
 
-		private Point _lastContextMenuCursorPosition;
-
 		// tray right-click menu
 		private void notifyIcon1_MouseClick(object sender, MouseEventArgs e) {
 			if (e.Button == MouseButtons.Right) {
-				_lastContextMenuCursorPosition = Cursor.Position;
 				notifyIcon1.ContextMenuStrip.Show(Cursor.Position);
 			}
 		}
@@ -447,23 +420,14 @@ namespace Sharer.Client {
 				case ContextMenuItems.CaptureArea:
 					_uploadCancellationTokenSource = new CancellationTokenSource();
 					CaptureArea(_uploadCancellationTokenSource.Token);
-					Task.Run(() => {
-						this.notifyIcon1.ContextMenuStrip.Invoke(new Action(() => notifyIcon1.ContextMenuStrip.Show(_lastContextMenuCursorPosition)));
-					});
 					break;
 				case ContextMenuItems.CaptureScreen:
 					_uploadCancellationTokenSource = new CancellationTokenSource();
 					CaptureScreen(_uploadCancellationTokenSource.Token);
-					Task.Run(() => {
-						this.notifyIcon1.ContextMenuStrip.Invoke(new Action(() => notifyIcon1.ContextMenuStrip.Show(_lastContextMenuCursorPosition)));
-					});
 					break;
 				case ContextMenuItems.Upload:
 					_uploadCancellationTokenSource = new CancellationTokenSource();
 					SelectAndUploadFiles(_uploadCancellationTokenSource.Token);
-					Task.Run(() => {
-						this.notifyIcon1.ContextMenuStrip.Invoke(new Action(() => notifyIcon1.ContextMenuStrip.Show(_lastContextMenuCursorPosition)));
-					});					
 					break;
 				case ContextMenuItems.Settings:
 					notifyIcon1_MouseDoubleClick(sender, new MouseEventArgs(MouseButtons.Left, 0, 0, 0, 0));
@@ -497,3 +461,25 @@ namespace Sharer.Client {
 		}
 	}
 }
+
+#region Optional TODO's
+// TODO: ffmpeg video record
+//private List<Image> frames = new List<Image>();
+//private async void Form1_Load(object sender, EventArgs e) {
+//	RecordOneSecond60Frames();
+//	int width = frames[0].Width;
+//	int height = frames[0].Height; zz
+//	  create instance of video writer
+//	VideoFileWriter writer = new VideoFileWriter();
+//	create new video file
+//	writer.Open(@"D:\frames\out.webm", width, height, 60, VideoCodec.Default);
+//	foreach (var f in frames) {
+//		writer.WriteVideoFrame((Bitmap)f);
+//	}
+//	writer.Close();
+//	writer.Dispose();
+//	frames.Clear();
+//	int i = 0;
+//	frames.ForEach(n => n.Save(string.Format(@"D:\frames\{0:00}.png", i++), System.Drawing.Imaging.ImageFormat.Png));
+//}
+#endregion

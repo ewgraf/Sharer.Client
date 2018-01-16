@@ -146,6 +146,7 @@
     <Compile Include="Helpers\FileHelper.cs" />
     <Compile Include="Helpers\ImageExtensions.cs" />
     <Compile Include="Helpers\ImageHelper.cs" />
+    <Compile Include="Helpers\ToastHelper.cs" />
     <Compile Include="InterceptKeys.cs" />
     <Compile Include="InterceptMouse.cs" />
     <Compile Include="Helpers\NetHelper.cs" />
