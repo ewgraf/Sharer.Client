@@ -37,12 +37,12 @@
 			// 
 			// buttonUpload
 			// 
-			this.buttonUpload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.buttonUpload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.buttonUpload.BackColor = System.Drawing.Color.WhiteSmoke;
 			this.buttonUpload.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
 			this.buttonUpload.Font = new System.Drawing.Font("Consolas", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
 			this.buttonUpload.ForeColor = System.Drawing.Color.LightSkyBlue;
-			this.buttonUpload.Location = new System.Drawing.Point(1, 227);
+			this.buttonUpload.Location = new System.Drawing.Point(214, 216);
 			this.buttonUpload.Name = "buttonUpload";
 			this.buttonUpload.Size = new System.Drawing.Size(58, 33);
 			this.buttonUpload.TabIndex = 1;
@@ -52,11 +52,12 @@
 			// 
 			// buttonDrawRectangle
 			// 
+			this.buttonDrawRectangle.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.buttonDrawRectangle.BackColor = System.Drawing.Color.WhiteSmoke;
 			this.buttonDrawRectangle.BackgroundImage = global::Sharer.Client.Properties.Resources.Red_rectangle;
 			this.buttonDrawRectangle.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
 			this.buttonDrawRectangle.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-			this.buttonDrawRectangle.Location = new System.Drawing.Point(1, 36);
+			this.buttonDrawRectangle.Location = new System.Drawing.Point(76, 215);
 			this.buttonDrawRectangle.Name = "buttonDrawRectangle";
 			this.buttonDrawRectangle.Size = new System.Drawing.Size(58, 33);
 			this.buttonDrawRectangle.TabIndex = 3;
@@ -65,11 +66,12 @@
 			// 
 			// buttonDrawArrow
 			// 
+			this.buttonDrawArrow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.buttonDrawArrow.BackColor = System.Drawing.Color.WhiteSmoke;
 			this.buttonDrawArrow.BackgroundImage = global::Sharer.Client.Properties.Resources.Red_arrow;
 			this.buttonDrawArrow.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
 			this.buttonDrawArrow.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-			this.buttonDrawArrow.Location = new System.Drawing.Point(1, 1);
+			this.buttonDrawArrow.Location = new System.Drawing.Point(12, 215);
 			this.buttonDrawArrow.Name = "buttonDrawArrow";
 			this.buttonDrawArrow.Size = new System.Drawing.Size(58, 34);
 			this.buttonDrawArrow.TabIndex = 2;
@@ -108,7 +110,7 @@
 			this.Opacity = 0.9D;
 			this.Text = "Edit capture";
 			this.TopMost = true;
-			this.TransparencyKey = System.Drawing.Color.Transparent;
+			this.TransparencyKey = System.Drawing.SystemColors.MenuHighlight;
 			this.Load += new System.EventHandler(this.EditCaptureForm_Load);
 			this.LocationChanged += new System.EventHandler(this.EditCaptureForm_LocationChanged);
 			this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.EditCaptureForm_KeyDown);
