@@ -38,7 +38,7 @@
 			// buttonUpload
 			// 
 			this.buttonUpload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.buttonUpload.BackColor = System.Drawing.Color.WhiteSmoke;
+			this.buttonUpload.BackColor = System.Drawing.Color.White;
 			this.buttonUpload.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
 			this.buttonUpload.Font = new System.Drawing.Font("Consolas", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
 			this.buttonUpload.ForeColor = System.Drawing.Color.LightSkyBlue;
@@ -53,7 +53,7 @@
 			// buttonDrawRectangle
 			// 
 			this.buttonDrawRectangle.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.buttonDrawRectangle.BackColor = System.Drawing.Color.WhiteSmoke;
+			this.buttonDrawRectangle.BackColor = System.Drawing.Color.White;
 			this.buttonDrawRectangle.BackgroundImage = global::Sharer.Client.Properties.Resources.Red_rectangle;
 			this.buttonDrawRectangle.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
 			this.buttonDrawRectangle.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
@@ -67,7 +67,7 @@
 			// buttonDrawArrow
 			// 
 			this.buttonDrawArrow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.buttonDrawArrow.BackColor = System.Drawing.Color.WhiteSmoke;
+			this.buttonDrawArrow.BackColor = System.Drawing.Color.White;
 			this.buttonDrawArrow.BackgroundImage = global::Sharer.Client.Properties.Resources.Red_arrow;
 			this.buttonDrawArrow.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
 			this.buttonDrawArrow.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
@@ -107,7 +107,6 @@
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
 			this.Name = "EditCaptureForm";
-			this.Opacity = 0.9D;
 			this.Text = "Edit capture";
 			this.TopMost = true;
 			this.TransparencyKey = System.Drawing.SystemColors.MenuHighlight;

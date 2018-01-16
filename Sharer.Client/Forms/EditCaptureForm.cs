@@ -139,7 +139,7 @@ namespace Sharer.Client.Forms {
 
 		private void DrawTool(Graphics g, Tools tool) {
 			if (tool == Tools.Rectangle) {
-				Pen pen = new Pen(Color.FromArgb(255, 255, 0, 0), 2);
+				Pen pen = new Pen(Color.FromArgb(255, 255, 0, 0), 3);
 				var area = new Rectangle(
 					Math.Min(_startPoint.X, _endPoint.X),
 					Math.Min(_startPoint.Y, _endPoint.Y),
