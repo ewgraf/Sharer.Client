@@ -91,6 +91,7 @@
 			this.pictureBox1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseDown);
 			this.pictureBox1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseMove);
 			this.pictureBox1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseUp);
+			this.pictureBox1.Move += new System.EventHandler(this.pictureBox1_Move);
 			// 
 			// EditCaptureForm
 			// 
@@ -102,13 +103,13 @@
 			this.Controls.Add(this.buttonDrawRectangle);
 			this.Controls.Add(this.buttonDrawArrow);
 			this.Controls.Add(this.pictureBox1);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
 			this.Name = "EditCaptureForm";
-			this.Opacity = 0.9D;
 			this.Text = "Edit capture";
 			this.TopMost = true;
-			this.TransparencyKey = System.Drawing.Color.Transparent;
+			this.TransparencyKey = System.Drawing.SystemColors.MenuHighlight;
 			this.Load += new System.EventHandler(this.EditCaptureForm_Load);
 			this.LocationChanged += new System.EventHandler(this.EditCaptureForm_LocationChanged);
 			this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.EditCaptureForm_KeyDown);

@@ -116,6 +116,12 @@
     <Compile Include="Entities\UploadHistory.cs" />
     <Compile Include="Entities\UploadResult.cs" />
     <Compile Include="FixedSizedQueue.cs" />
+    <Compile Include="Forms\ArrowForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ArrowForm.Designer.cs">
+      <DependentUpon>ArrowForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\AuthForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -170,6 +176,9 @@
     <Compile Include="Smth\WaterMarkTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <EmbeddedResource Include="Forms\ArrowForm.resx">
+      <DependentUpon>ArrowForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\AuthForm.resx">
       <DependentUpon>AuthForm.cs</DependentUpon>
     </EmbeddedResource>
