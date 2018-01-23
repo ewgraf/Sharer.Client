@@ -42,9 +42,9 @@
 			this.buttonUpload.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
 			this.buttonUpload.Font = new System.Drawing.Font("Consolas", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
 			this.buttonUpload.ForeColor = System.Drawing.Color.LightSkyBlue;
-			this.buttonUpload.Location = new System.Drawing.Point(214, 216);
+			this.buttonUpload.Location = new System.Drawing.Point(214, 215);
 			this.buttonUpload.Name = "buttonUpload";
-			this.buttonUpload.Size = new System.Drawing.Size(58, 33);
+			this.buttonUpload.Size = new System.Drawing.Size(58, 34);
 			this.buttonUpload.TabIndex = 1;
 			this.buttonUpload.Text = "↑☁";
 			this.buttonUpload.UseVisualStyleBackColor = false;
@@ -59,7 +59,7 @@
 			this.buttonDrawRectangle.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
 			this.buttonDrawRectangle.Location = new System.Drawing.Point(76, 215);
 			this.buttonDrawRectangle.Name = "buttonDrawRectangle";
-			this.buttonDrawRectangle.Size = new System.Drawing.Size(58, 33);
+			this.buttonDrawRectangle.Size = new System.Drawing.Size(58, 34);
 			this.buttonDrawRectangle.TabIndex = 3;
 			this.buttonDrawRectangle.UseVisualStyleBackColor = false;
 			this.buttonDrawRectangle.Click += new System.EventHandler(this.buttonDrawRectangle_Click);
@@ -100,14 +100,15 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoScroll = true;
 			this.ClientSize = new System.Drawing.Size(284, 261);
+			this.ControlBox = false;
 			this.Controls.Add(this.buttonUpload);
 			this.Controls.Add(this.buttonDrawRectangle);
 			this.Controls.Add(this.buttonDrawArrow);
 			this.Controls.Add(this.pictureBox1);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
 			this.Name = "EditCaptureForm";
-			this.Text = "Edit capture";
 			this.TopMost = true;
 			this.TransparencyKey = System.Drawing.SystemColors.MenuHighlight;
 			this.Load += new System.EventHandler(this.EditCaptureForm_Load);
@@ -125,5 +126,5 @@
         private System.Windows.Forms.Button buttonDrawArrow;
         private System.Windows.Forms.Button buttonDrawRectangle;
         private System.Windows.Forms.Button buttonUpload;
-    }
+	}
 }

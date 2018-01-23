@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 class InterceptKeys {
@@ -11,7 +12,7 @@ class InterceptKeys {
     private static IntPtr _hookID = IntPtr.Zero;
     private static Action<CancellationToken> CtrlShiftD2OuterCallback;   // @
     private static Action<CancellationToken> CtrlShiftD3OuterCallback;   // #
-    private static Action<CancellationToken> CtrlShiftD6OuterCallback; // ^
+    private static Func<CancellationToken, Task> CtrlShiftD6OuterCallback; // ^
 
     // Specifies the type of hook procedure to be installed
     public enum HookType {
@@ -35,7 +36,7 @@ class InterceptKeys {
 
 	private static CancellationToken _token;
 
-	public static void SetHooks(Action<CancellationToken> act0, Action<CancellationToken> act1, Action<CancellationToken> act2, CancellationToken token) {
+	public static void SetHooks(Action<CancellationToken> act0, Action<CancellationToken> act1, Func<CancellationToken, Task> act2, CancellationToken token) {
         _hookID = SetHook(_proc);
         CtrlShiftD2OuterCallback = act0;
         CtrlShiftD3OuterCallback = act1;

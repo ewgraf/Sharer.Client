@@ -8,8 +8,6 @@ using System.Windows.Forms;
 using Sharer.Client.Entities;
 using Sharer.Client.Forms;
 using Sharer.Client.Helpers;
-using Windows.Data.Xml.Dom;
-using Windows.UI.Notifications;
 
 namespace Sharer.Client {
 	public partial class MainForm : Form {
@@ -102,12 +100,18 @@ namespace Sharer.Client {
 			};
 			uploadFinished = () => {
 				try {
-					this.notifyIcon1.ContextMenuStrip.Invoke(new Action(() => {
+					if (this.notifyIcon1.ContextMenuStrip.InvokeRequired) {
+						this.notifyIcon1.ContextMenuStrip.Invoke(new Action(() => {
+							(this.notifyIcon1.ContextMenuStrip.Items["History"] as ToolStripMenuItem).Text = ContextMenuItems.History;
+							(this.notifyIcon1.ContextMenuStrip.Items["History"] as ToolStripMenuItem).DropDownItems.Clear();
+							(this.notifyIcon1.ContextMenuStrip.Items["History"] as ToolStripMenuItem).DropDownItems.AddRange(_history.HistoryItems);
+						}));
+					} else {
 						(this.notifyIcon1.ContextMenuStrip.Items["History"] as ToolStripMenuItem).Text = ContextMenuItems.History;
 						(this.notifyIcon1.ContextMenuStrip.Items["History"] as ToolStripMenuItem).DropDownItems.Clear();
 						(this.notifyIcon1.ContextMenuStrip.Items["History"] as ToolStripMenuItem).DropDownItems.AddRange(_history.HistoryItems);
-					}));
-				} catch {
+					}
+				} catch (Exception ex) {
 					;
 				}
 			};
@@ -132,13 +136,14 @@ namespace Sharer.Client {
 		#endregion
 
 		private async void Form1_Load(object sender, EventArgs e) {
+			notifyIcon1_MouseClick(sender, new MouseEventArgs(MouseButtons.Right, 0, 0, 0, 0));
 			this.WindowState = FormWindowState.Minimized;
 			this.ShowInTaskbar = false;
 			if (!Auth()) {
 				Application.Exit();
 				return;
 			}
-			notifyIcon1.ShowBalloonTip(250, $"Good day, {_account.Email.Split('@')[0]}-san!", "Sharer is working in the background", ToolTipIcon.Info);
+			//notifyIcon1.ShowBalloonTip(250, $"Good day, {_account.Email.Split('@')[0]}-san!", "Sharer is working in the background", ToolTipIcon.Info);
 
 			if (_openWithSharerFileUploadPath != null) {
 				await UploadPath(_openWithSharerFileUploadPath, this, CancellationToken.None);
@@ -265,7 +270,7 @@ namespace Sharer.Client {
 			}
 		}
 
-		private void InitKeyHooks() {
+		private async void InitKeyHooks() {
 			InterceptKeys.SetHooks(
 				CaptureScreen,          // Ctrl+Shift+2 @
 				CaptureArea,            // Ctrl+Shift+3 #
@@ -346,6 +351,22 @@ namespace Sharer.Client {
 					}
 					Thread.Sleep(100);
 				}
+				try {
+					this.notifyIcon1.Icon = _icon;
+					if (this.notifyIcon1.ContextMenuStrip.InvokeRequired) {
+						this.notifyIcon1.ContextMenuStrip.Invoke(new Action(() => {
+							(this.notifyIcon1.ContextMenuStrip.Items["History"] as ToolStripMenuItem).Text = ContextMenuItems.History;
+							(this.notifyIcon1.ContextMenuStrip.Items["History"] as ToolStripMenuItem).DropDownItems.Clear();
+							(this.notifyIcon1.ContextMenuStrip.Items["History"] as ToolStripMenuItem).DropDownItems.AddRange(_history.HistoryItems);
+						}));
+					} else {
+						(this.notifyIcon1.ContextMenuStrip.Items["History"] as ToolStripMenuItem).Text = ContextMenuItems.History;
+						(this.notifyIcon1.ContextMenuStrip.Items["History"] as ToolStripMenuItem).DropDownItems.Clear();
+						(this.notifyIcon1.ContextMenuStrip.Items["History"] as ToolStripMenuItem).DropDownItems.AddRange(_history.HistoryItems);
+					}
+				} catch (Exception ex) {
+					;
+				}
 			});
 		}
 
@@ -356,7 +377,7 @@ namespace Sharer.Client {
 		}
 
 
-		private async void SelectAndUploadFiles(CancellationToken token) {
+		private async Task SelectAndUploadFiles(CancellationToken token) {
 			string[] selectedFiles = OpenSelectFilesDialog();
 			foreach (string filePath in selectedFiles) {
 				try {
