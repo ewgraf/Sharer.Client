@@ -52,7 +52,7 @@ namespace Sharer.Client.Helpers {
 
 		public static string GetPassword() {
 			var config = GetConfiguration();
-			return config.AppSettings.Settings["email"].Value;
+			return config.AppSettings.Settings["password"].Value;
 		}
 
 		public static void SetPassword(string password) {
