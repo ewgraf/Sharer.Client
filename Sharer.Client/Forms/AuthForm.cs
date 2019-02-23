@@ -40,6 +40,7 @@ namespace Sharer.Client {
 		private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
 			System.Diagnostics.Process.Start($"{Sharer.Uris.SharerServer}/index.html");
 		}
+
 		// "Username" textbox
 		private void waterMarkTextBox_Password_KeyDown(object sender, KeyEventArgs e) {
 			if (e.KeyCode == Keys.Enter) {
@@ -53,7 +54,6 @@ namespace Sharer.Client {
 			}
 		}
 
-		// "Auth" button
 		private void buttonAuth_Click(object sender, EventArgs e) {
 			Auth();
 		}
@@ -63,7 +63,6 @@ namespace Sharer.Client {
 			this.waterMarkTextBox_Password.Enabled = false;
 			this.buttonAuth.Enabled = false;
 			this.checkBox_RememberMe.Enabled = false;
-			//bool userExists = await NetHelper.TryAuthenticate(waterMarkTextBox_Email.Text, waterMarkTextBox_Password.Text);
 			bool userExists = false;
 			try {
 				userExists = await NetHelper.TryAuthenticate(waterMarkTextBox_Email.Text, waterMarkTextBox_Password.Text);

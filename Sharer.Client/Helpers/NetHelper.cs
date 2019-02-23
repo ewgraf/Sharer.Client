@@ -6,11 +6,12 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web.Script.Serialization;
 using Sharer.Client.Entities;
 
 namespace Sharer.Client.Helpers {
 	public static class NetHelper {
+		private static readonly HttpClient _client = new HttpClient();
+
 		public static async Task<string> UploadPath(string path, Account account, CancellationToken token) {
 			if (string.IsNullOrEmpty(path)) {
 				throw new ArgumentOutOfRangeException(nameof(path));
@@ -26,17 +27,18 @@ namespace Sharer.Client.Helpers {
 				if (token.IsCancellationRequested) {
 					return null;
 				}
-				using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read)) {
-					var content = new MultipartFormDataContent();
+				using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read)) {
+					var content = new MultipartFormDataContent("sharerClientBoundaryString");
 					content.Add(new StreamContent(stream), "file", Path.GetFileName(path));
 
-					response = POST($"{Sharer.Uris.SharerServer}/api/user/upload", content, account, token);
+					response = POST($"{Sharer.Uris.SharerServer}/account/apiupload", content, account, token);
 					if (token.IsCancellationRequested) {
 						return null;
 					}
 
 					if (response.IsSuccessStatusCode) {
-						result = await response.Content.ReadAsStringAsync();
+						result = await response.Content.ReadAsStringAsync(); // ["xraXn"]
+						result = result.Substring(2, result.Length - 4);
 						result = result.Replace("\"", string.Empty);
 						if (result == "null") {
 							continue;
@@ -58,35 +60,36 @@ namespace Sharer.Client.Helpers {
 		}
 
 		public static HttpResponseMessage POST(string uri, Dictionary<string, string> values) {
-			using (var client = new HttpClient()) {
-				FormUrlEncodedContent content = new FormUrlEncodedContent(values);
-				return client.PostAsync(uri, content).Result;
-			}
+			FormUrlEncodedContent content = new FormUrlEncodedContent(values);
+			return _client.PostAsync(uri, content).Result;
 		}
 
 		public static HttpResponseMessage POST(string uri, MultipartFormDataContent content, Account account, CancellationToken token) {
-			using (var client = new HttpClient()) {
-				//client.DefaultRequestHeaders.Add("Authorization", $"Bearer {account.Token}");
-				string credentials = $"{account.Email.Replace("@", "%40")}:{account.Password}";
-				string base64credentials = Base64Encode(credentials);
-				client.DefaultRequestHeaders.Add("Authorization", $"Basic {base64credentials}");
-				return client.PostAsync(uri, content, token).Result;
-			}
+			//client.DefaultRequestHeaders.Add("Authorization", $"Bearer {account.Token}");
+			string credentials = $"{account.Email}:{account.Password}";
+			string base64credentials = Base64Encode(credentials);
+			_client.DefaultRequestHeaders.Clear();
+			_client.DefaultRequestHeaders.Add("Authorization", $"Basic {base64credentials}");
+			return _client.PostAsync(uri, content, token).Result;
 		}
 
 		public static async Task<bool> TryAuthenticate(string email, string password) {
-			using (var client = new HttpClient()) {
-				string credentials = $"{email.Replace("@", "%40")}:{password}";
-				string base64credentials = Base64Encode(credentials);
-				client.DefaultRequestHeaders.Add("Authorization", $"Basic {base64credentials}");
-				var responce = await client.PostAsync(Sharer.Uris.Authenticate, null);
-				if (responce.StatusCode == HttpStatusCode.OK) {
-					return true;
-				} else if (responce.StatusCode == HttpStatusCode.NotFound) {
-					return false;
-				} else {
-					throw new InvalidOperationException($"Unexpected authentication responce status code: {responce.StatusCode}");
-				}
+			string credentials = $"{email}:{password}";
+			string base64credentials = Base64Encode(credentials);
+			_client.DefaultRequestHeaders.Clear();
+			_client.DefaultRequestHeaders.Add("Authorization", $"Basic {base64credentials}");
+			HttpResponseMessage responce;
+			try {
+				responce = await _client.PostAsync(Sharer.Uris.Auth, null);
+			} catch (Exception ex) {
+				return false;
+			}
+			if (responce.StatusCode == HttpStatusCode.OK) {
+				return true;
+			} else if (responce.StatusCode == HttpStatusCode.NotFound) {
+				return false;
+			} else {
+				throw new InvalidOperationException($"Unexpected authentication responce status code: {responce.StatusCode}");
 			}
 		}
 
@@ -148,10 +151,11 @@ namespace Sharer.Client.Helpers {
 			}
 		}
 
-		public static byte[] ASCIIEncode(string data) => new ASCIIEncoding().GetBytes(data);
+		public static byte[] ASCIIEncode(string data) {
+			return new ASCIIEncoding().GetBytes(data);
+		}
 
-		public static string GetStringResponse(HttpWebResponse response)
-		{
+		public static string GetStringResponse(HttpWebResponse response) {
 			WebHeaderCollection header = response.Headers;
 			
 			using (var reader = new StreamReader(response.GetResponseStream(), ASCIIEncoding.ASCII)) {

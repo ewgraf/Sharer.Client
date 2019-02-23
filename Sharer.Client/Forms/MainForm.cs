@@ -210,16 +210,13 @@ namespace Sharer.Client {
 				result = await NetHelper.UploadPath(filePath, account, token);
 
 				if (result.Length > 0) {
-					if (result[0] == '+') {
-						result = result.Substring(1, result.Length - 1);
-						form.SetClipboardAndShowToast(filePath, result);
-						_history.Add($"{result}{Path.GetExtension(filePath)}", TryOpenImage(filePath));
-						_contextMenuUploadFinished();
-					} else if (result[0] == '-') {
+					if (result[0] == '-') {
 						throw new InvalidOperationException(result.Substring(1, result.Length - 1).Replace("\\n", Environment.NewLine));
-					} else {
-						throw new InvalidOperationException($"Server refused uploading file. May you retry");
 					}
+					result = $"{Sharer.Uris.SharerServer}/i/{result}";
+					form.SetClipboardAndShowToast(filePath, result);
+					_history.Add($"{result}{Path.GetExtension(filePath)}", TryOpenImage(filePath));
+					_contextMenuUploadFinished();
 				}
 			} catch (Exception ex) {
 				MessageBox.Show(ex.Message, $"Failed to upload");

@@ -5,11 +5,11 @@ using System.Net;
 namespace Sharer.Client {
 	public static class Sharer {
 		public static class Uris {
-			public const string SharerServer = "https://sharer.su";
-			//public const string SharerServer = "http://localhost:28188";
+			//public const string SharerServer = "https://sharer.su";
+			public const string SharerServer = "http://localhost:5000";
 			public static string AuthToken = $"{SharerServer}/token";
 			public static string AccountPage = $"{SharerServer}/account";
-			public static string Authenticate = $"{SharerServer}/api/auth/authenticate";
+			public static string Auth = $"{SharerServer}/api/user/auth";
 		}
 
 		public const int MaxMb = 128;
