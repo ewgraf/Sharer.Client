@@ -36,6 +36,9 @@ namespace Sharer.Client.Helpers {
 						return null;
 					}
 
+					if (response.StatusCode == HttpStatusCode.Unauthorized) {
+						// TODO: Logout
+					}
 					if (response.IsSuccessStatusCode) {
 						result = await response.Content.ReadAsStringAsync(); // ["xraXn"]
 						result = result.Substring(2, result.Length - 4);
