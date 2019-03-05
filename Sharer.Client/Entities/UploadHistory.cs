@@ -12,13 +12,13 @@ namespace Sharer.Client.Entities {
 
 		public ToolStripMenuItem[] HistoryItems {
 			get {
-				List<ToolStripMenuItem> items = new List<ToolStripMenuItem>();
+				var items = new List<ToolStripMenuItem>();
 				ToolStripMenuItem item;
 				while (_queue.TryDequeue(out item)) {
 					items.Add(item);
 				}
 				items.ForEach(i => _queue.Enqueue(i));
-				if (items.Count > 0) {                    
+				if (items.Count > 0) {
 					return items.ToArray();
 				} else {
 					return new[] { EmptyHistory };

@@ -6,10 +6,10 @@ using Sharer.Client.Entities;
 
 namespace Sharer.Client {
 	public partial class AuthForm : Form {
-		public Account _account { get; private set; }
+		public Account Account { get; private set; }
 
 		public AuthForm(Account account) {
-			_account = account;
+			Account = account;
 
 			InitializeComponent();
 		}
@@ -27,12 +27,12 @@ namespace Sharer.Client {
 			hint_RememberMe.AutoPopDelay = 10000;
 			hint_RememberMe.SetToolTip(this.checkBox_RememberMe, $@"Stores Email and Password in Registry at HKEY_CURRENT_USER\Software\Sharer\Account.");
 
-			if(_account != null) {
-				this.waterMarkTextBox_Email.Text = _account.Email;
-				this.waterMarkTextBox_Password.Text = _account.Password;
+			if (Account != null) {
+				this.waterMarkTextBox_Email.Text = Account.Email;
+				this.waterMarkTextBox_Password.Text = Account.Password;
 				Auth();
 			} else {
-				_account = new Account();
+				Account = new Account();
 			}
 		}
 
@@ -69,10 +69,10 @@ namespace Sharer.Client {
 			} catch { }
 			if (userExists) {
 				this.BackColor = Color.Green;
-				_account.Email = waterMarkTextBox_Email.Text;
-				_account.Password = waterMarkTextBox_Password.Text;
-				_account.RememberMe = checkBox_RememberMe.Checked;
-				_account.IsAuthorized = true;
+				Account.Email = waterMarkTextBox_Email.Text;
+				Account.Password = waterMarkTextBox_Password.Text;
+				Account.RememberMe = checkBox_RememberMe.Checked;
+				Account.IsAuthorized = true;
 				this.DialogResult = DialogResult.OK;
 			} else {
 				this.BackColor = Color.Red;

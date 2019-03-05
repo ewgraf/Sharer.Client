@@ -112,7 +112,7 @@
     <Compile Include="Entities\Account.cs" />
     <Compile Include="Entities\UploadHistory.cs" />
     <Compile Include="Entities\UploadResult.cs" />
-    <Compile Include="FixedSizedQueue.cs" />
+    <Compile Include="Entities\FixedSizedQueue.cs" />
     <Compile Include="Forms\AuthForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -132,7 +132,6 @@
       <DependentUpon>EditCaptureForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GlobalHotKeys.cs" />
-    <Compile Include="Helpers\AuthHelper.cs" />
     <Compile Include="Forms\RedAreaForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -217,7 +216,6 @@
   <ItemGroup>
     <None Include="Resources\Red arrow.png" />
     <None Include="Resources\Red rectangle.png" />
-    <Content Include="FodyWeavers.xml" />
     <Content Include="sharerIcon4.ico" />
   </ItemGroup>
   <ItemGroup>

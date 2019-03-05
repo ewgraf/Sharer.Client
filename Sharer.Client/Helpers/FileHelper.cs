@@ -9,7 +9,7 @@ namespace Sharer.Client.Helpers {
 			if (value == 0) {
 				return "0 Byte";
 			}
-			var k = 1024;			
+			var k = 1024;
 			var i = (int)Math.Floor(Math.Log(value) / Math.Log(k));
 			return $"{(value / Math.Pow(k, i)):0.#} {Sizes[i]}";
 		}

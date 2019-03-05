@@ -65,7 +65,6 @@ namespace Sharer.Client.Helpers {
 		}
 
 		public static HttpResponseMessage POST(string uri, MultipartFormDataContent content, Account account, CancellationToken token) {
-			//client.DefaultRequestHeaders.Add("Authorization", $"Bearer {account.Token}");
 			string credentials = $"{account.Email}:{account.Password}";
 			string base64credentials = Base64Encode(credentials);
 			_client.DefaultRequestHeaders.Clear();
@@ -98,55 +97,14 @@ namespace Sharer.Client.Helpers {
 			return Convert.ToBase64String(dataBytes);
 		}
 
-		//public static string GetToken(string username, string password, out string token) {
-		//	HttpResponseMessage response = POST(Sharer.Uris.AuthToken, new Dictionary<string, string> {
-		//		{ "grant_type", "password" },
-		//		{ "username", username },
-		//		{ "password", password },
-		//	});
-
-		//	try {
-		//		////JSONResponce jresponce = GetJSONResponce(response);
-		//		////token = jresponce.access_token;
-		//		//token = JsonConvert.DeserializeObject<JSONResponce>(Task.Run(() => response.Content.ReadAsStringAsync()).Result).access_token;
-		//		token = string.Empty;
-		//		return string.Empty; // no exceptions, but success not guaranteed, need to check 
-		//	} catch (WebException wex) {
-		//		token = null;
-		//		var httpResponse = wex.Response as HttpWebResponse;
-		//		if (httpResponse != null) {
-		//			return string.Format(
-		//				"Remote server call {0} {1} resulted in a http error {2} {3}.{5}Inner: {4}",
-		//				"POST",
-		//				Sharer.Uris.AuthToken,
-		//				httpResponse.StatusCode,
-		//				httpResponse.StatusDescription, 
-		//				wex.Message,
-		//				Environment.NewLine);
-		//		} else {
-		//			return string.Format(
-		//				"Remote server call {0} {1} resulted in an error.{5}Inner: {4}",
-		//				"POST",
-		//				Sharer.Uris.AuthToken,
-		//				wex.Message,
-		//				Environment.NewLine);
-		//		}
-		//	} catch (Exception) {
-		//		throw;
-		//	} finally {
-		//		response.Dispose();
-		//	}
-		//}
-		
-		public static HttpWebResponse GetResponseNoException(this HttpWebRequest req)
-		{
+		public static HttpWebResponse GetResponseNoException(this HttpWebRequest req) {
 			try {
 				return (HttpWebResponse)req.GetResponse();
 			} catch (WebException we) {
 				var resp = we.Response as HttpWebResponse;
 				if (resp == null) {
 					throw;
-				}                    
+				}
 				return resp;
 			}
 		}
@@ -156,25 +114,9 @@ namespace Sharer.Client.Helpers {
 		}
 
 		public static string GetStringResponse(HttpWebResponse response) {
-			WebHeaderCollection header = response.Headers;
-			
 			using (var reader = new StreamReader(response.GetResponseStream(), ASCIIEncoding.ASCII)) {
 				return reader.ReadToEnd();
 			}
 		}
-
-		//public static JSONResponce GetJSONResponce(HttpResponseMessage response)
-		//{
-		//	JSONResponce jresponce;
-		//	JavaScriptSerializer js = new JavaScriptSerializer();
-		//	try {
-		//		using (var reader = new StreamReader(response.Content.ReadAsStreamAsync().Result)) {
-		//			jresponce = js.Deserialize<JSONResponce>(reader.ReadToEnd());
-		//		}
-		//	} finally {
-		//		js = null;
-		//	}
-		//	return jresponce;
-		//}
 	}
 }

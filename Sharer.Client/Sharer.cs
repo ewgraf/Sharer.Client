@@ -5,8 +5,7 @@ using System.Net;
 namespace Sharer.Client {
 	public static class Sharer {
 		public static class Uris {
-			//public const string SharerServer = "https://sharer.su";
-			public const string SharerServer = "http://localhost:5000";
+			public const string SharerServer = "https://sharer.su";
 			public static string AuthToken = $"{SharerServer}/token";
 			public static string AccountPage = $"{SharerServer}/account";
 			public static string Auth = $"{SharerServer}/api/user/auth";

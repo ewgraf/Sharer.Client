@@ -21,6 +21,7 @@ namespace Sharer.Client {
 		private readonly Action _contextMenuUploadCancelled;
 		private readonly Action _contextMenuUploadFinished;
 		private CancellationTokenSource _uploadCancellationTokenSource;
+		private bool _uploading;
 
 		private readonly Icon _icon;
 
@@ -153,13 +154,27 @@ namespace Sharer.Client {
 		}
 
 		private bool Auth() {
-			_account = AuthHelper.TryAuth();
+			_account = TryAuth();
 			if (_account != null) {
 				linkLabelEmail.Text = _account.Email;
 				return true;
 			} else {
 				return false;
 			}
+		}
+
+		private Account TryAuth() {
+			var account = ConfigHelper.FindAccount();
+			using (var form = new AuthForm(account)) {
+				if (form.ShowDialog() != DialogResult.OK) {
+					return null;
+				}
+				account = form.Account;
+			}
+			if (account.RememberMe) {
+				ConfigHelper.SetAccount(account);
+			}
+			return account;
 		}
 
 		public void SetClipboardAndShowToast(string filePath, string link) {
@@ -312,9 +327,6 @@ namespace Sharer.Client {
 				UploadImage(image, token);
 			}
 		}
-
-
-		private bool _uploading;
 
 		private Task StartDisplayProgress(string size) {
 			Cursor.Current = Cursors.WaitCursor;

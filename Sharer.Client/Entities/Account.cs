@@ -10,7 +10,7 @@ namespace Sharer.Client.Entities {
 
 		public override string ToString() {
 			string hiddenPassword = Password != null ? string.Join("", Enumerable.Repeat("*", Password.Length)) : "null";
-			return $"Email: {Email} Password: {hiddenPassword}";			
+			return $"Email: {Email} Password: {hiddenPassword}";
 		}
 	}
 }

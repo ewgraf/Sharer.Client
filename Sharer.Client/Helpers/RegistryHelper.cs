@@ -6,7 +6,7 @@ namespace Sharer.Client.Helpers {
 	public static class RegistryHelper {
 		private const string AccountKeyPath = @"Software\Sharer\Account";
 
-		public static Account FindAccount() {			
+		public static Account FindAccount() {
 			RegistryKey key = Registry.CurrentUser.OpenSubKey(AccountKeyPath);
 			if (key == null) {
 				//throw new InvalidOperationException($@"Failed opening 'HKEY_CURRENT_USER\{AccountKeyPath}' registry key. Try to auth in Sharer on your computer or reinstall one.");
@@ -14,7 +14,7 @@ namespace Sharer.Client.Helpers {
 			}
 
 			Account account = new Account {
-				Email    = (string)key.GetValue("Email"),
+				Email = (string)key.GetValue("Email"),
 				Password = (string)key.GetValue("Password"),
 			};
 

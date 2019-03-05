@@ -2,19 +2,16 @@
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace Sharer.Client
-{
-	public partial class AreaSelectionForm : Form
-	{
+namespace Sharer.Client {
+	public partial class AreaSelectionForm : Form {
+		public Rectangle SelectedRectangle;
+
 		private bool _drawingRectangleMode;
 		private bool _drawingRectangleNow;
-		private Point RectStartPoint;
+		private Point _rectStartPoint;
+		private RedAreaForm _formForDrawingRedArea;
 
-		public Rectangle SelectedRectangle;
-		private RedAreaForm formForDrawingRedArea;
-
-		public AreaSelectionForm()
-		{
+		public AreaSelectionForm() {
 			InitializeComponent();
 
 			// to make form almost invisible, but still clickable
@@ -25,8 +22,7 @@ namespace Sharer.Client
 			this.ShowInTaskbar = false;
 		}
 
-		private void Form2_Load(object sender, EventArgs e)
-		{
+		private void Form2_Load(object sender, EventArgs e) {
 			//this.ShowInTaskbar = false;
 			//this.LostFocus += Form2_LostFocus;
 
@@ -35,62 +31,57 @@ namespace Sharer.Client
             
 			SelectedRectangle = new Rectangle();
             
-			formForDrawingRedArea = new RedAreaForm();
-			formForDrawingRedArea.Show();
+			_formForDrawingRedArea = new RedAreaForm();
+			_formForDrawingRedArea.Show();
 		}
 
-		private void Form2_MouseDown(object sender, MouseEventArgs e)
-		{
+		private void Form2_MouseDown(object sender, MouseEventArgs e) {
 			if (e.Button == MouseButtons.Right) {
 				SelectedRectangle = Rectangle.Empty;
-				formForDrawingRedArea.Close();
+				_formForDrawingRedArea.Close();
 				this.Close();
 			}
 			if (_drawingRectangleMode) {
 				if (e.Button == MouseButtons.Left) {
-					RectStartPoint = e.Location;
+					_rectStartPoint = e.Location;
 					_drawingRectangleNow = true;
 				}
 			}
 		}
 
-		private void Form2_MouseUp(object sender, MouseEventArgs e)
-		{
+		private void Form2_MouseUp(object sender, MouseEventArgs e) {
 			if (e.Button == MouseButtons.Left && _drawingRectangleMode == true) {
 				this.Cursor = Cursors.Default;
 
 				_drawingRectangleMode = false;
 				_drawingRectangleNow = false;
 
-				formForDrawingRedArea.Close();
+				_formForDrawingRedArea.Close();
 
 				this.DialogResult = DialogResult.OK;
 				this.Close();
 			}
 		}
 
-		private void Form2_MouseMove(object sender, MouseEventArgs e)
-		{
+		private void Form2_MouseMove(object sender, MouseEventArgs e) {
 			if (_drawingRectangleMode && _drawingRectangleNow) {
 				SelectedRectangle.Location = new Point(
-					Math.Min(RectStartPoint.X, e.X),
-					Math.Min(RectStartPoint.Y, e.Y));
+					Math.Min(_rectStartPoint.X, e.X),
+					Math.Min(_rectStartPoint.Y, e.Y));
 				SelectedRectangle.Size = new Size(
-					Math.Abs(RectStartPoint.X - e.X),
-					Math.Abs(RectStartPoint.Y - e.Y));
-				formForDrawingRedArea.SelectedRectangle = SelectedRectangle;
-				formForDrawingRedArea.Invalidate();
+					Math.Abs(_rectStartPoint.X - e.X),
+					Math.Abs(_rectStartPoint.Y - e.Y));
+				_formForDrawingRedArea.SelectedRectangle = SelectedRectangle;
+				_formForDrawingRedArea.Invalidate();
 			}
 		}
 
-		private void Form2_FormClosing(object sender, FormClosingEventArgs e)
-		{
-			this.formForDrawingRedArea.Close();
+		private void Form2_FormClosing(object sender, FormClosingEventArgs e) {
+			this._formForDrawingRedArea.Close();
 		}
 
-		private void Form2_KeyDown(object sender, KeyEventArgs e)
-		{
-			if(!(e.Control && e.Shift && e.KeyCode == Keys.D3)) {
+		private void Form2_KeyDown(object sender, KeyEventArgs e) {
+			if (!(e.Control && e.Shift && e.KeyCode == Keys.D3)) {
 				this.DialogResult = DialogResult.Cancel;
 				this.Close();
 			}

@@ -19,8 +19,7 @@ namespace Sharer.Client.Helpers {
 		/// <param name="width">The width to resize to.</param>
 		/// <param name="height">The height to resize to.</param>
 		/// <returns>The resized image.</returns>
-		public static Image Resize(this Image image, int width, int height)
-		{
+		public static Image Resize(this Image image, int width, int height) {
 			var destRect = new Rectangle(0, 0, width, height);
 			var destImage = new Bitmap(width, height);
 			destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
@@ -36,6 +35,14 @@ namespace Sharer.Client.Helpers {
 				}
 			}
 			return destImage;
+		}
+
+		public static Image Crop(this Image image, Rectangle area) {
+			var target = new Bitmap(area.Width, area.Height);
+			using (var g = Graphics.FromImage(target)) {
+				g.DrawImage(image, new Rectangle(0, 0, target.Width, target.Height), area, GraphicsUnit.Pixel);
+			}
+			return target;
 		}
 	}
 }

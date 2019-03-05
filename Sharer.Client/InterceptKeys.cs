@@ -10,8 +10,8 @@ class InterceptKeys {
     private const int WM_KEYDOWN = 0x0100;
     private static LowLevelKeyboardProc _proc = HookCallback;
     private static IntPtr _hookID = IntPtr.Zero;
-    private static Action<CancellationToken> CtrlShiftD2OuterCallback;   // @
-    private static Action<CancellationToken> CtrlShiftD3OuterCallback;   // #
+    private static Action<CancellationToken> CtrlShiftD2OuterCallback;     // @
+    private static Action<CancellationToken> CtrlShiftD3OuterCallback;     // #
     private static Func<CancellationToken, Task> CtrlShiftD6OuterCallback; // ^
 
     // Specifies the type of hook procedure to be installed

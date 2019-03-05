@@ -28,7 +28,7 @@ namespace Sharer.Client
 		public GlobalHotKeys()
 		{
 			//this.Handle = Process.GetCurrentProcess().Handle;
-			this.Handle = IntPtr.Zero;			
+			this.Handle = IntPtr.Zero;
 		}
 
 		/// <summary>Handle of the current process</summary>
