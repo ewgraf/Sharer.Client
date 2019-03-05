@@ -40,15 +40,14 @@ namespace Sharer.Client {
 					using (TcpClient client = new TcpClient()) {
 						client.Connect(Sharer.EndPoint);
 						NetworkStream networkStream = client.GetStream();
-						byte[] mesasge = Encoding.UTF8.GetBytes(filePath);
-						networkStream.Write(mesasge, 0, mesasge.Length);
+						byte[] message = Encoding.UTF8.GetBytes(filePath);
+						networkStream.Write(message, 0, message.Length);
 						networkStream.Flush();
 						networkStream.Close();
 						networkStream.Dispose();
 					}
 				} catch (Exception ex) {
 					MessageBox.Show(ex.ToString());
-				} finally {
 				}
 			}
 		}

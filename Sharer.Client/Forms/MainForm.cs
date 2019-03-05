@@ -56,7 +56,7 @@ namespace Sharer.Client {
 		#region MainForm
 
 		private void SetupCheckBoxEditBeforeUpload() {
-			new ToolTip() {
+			new ToolTip {
 				ShowAlways = true,
 				InitialDelay = 1,
 				AutoPopDelay = 10000
@@ -172,8 +172,6 @@ namespace Sharer.Client {
 		}
 
 		public async Task UploadPath(string filePath, MainForm form, CancellationToken token) {
-			Account account = null;
-			string result = null;
 			if (!Sharer.FileSizeCorrect(filePath)) {
 				MessageBox.Show($"Sorry, but uploading file '{filePath}' exceeds size limits of {Sharer.MaxMb}Mb");
 				return;
@@ -190,12 +188,12 @@ namespace Sharer.Client {
 					throw new ArgumentNullException(nameof(form));
 				}
 
-				account = ConfigHelper.FindAccount();
+				var account = ConfigHelper.FindAccount();
 				if (account == null) {
 					throw new InvalidOperationException("Account was not found, try to relog");
 				}
 				
-				result = await NetHelper.UploadPath(filePath, account, token);
+				var result = await NetHelper.UploadPath(filePath, account, token);
 
 				if (result.Length > 0) {
 					if (result[0] == '-') {
@@ -208,7 +206,6 @@ namespace Sharer.Client {
 				}
 			} catch (Exception ex) {
 				MessageBox.Show(ex.Message, $"Failed to upload");
-				return;
 			} finally {
 				StopDisplayProgress();
 			}
@@ -216,7 +213,7 @@ namespace Sharer.Client {
 		
 		public static Task RunSTATask(Action action) {
 			var tcs = new TaskCompletionSource<Action>();
-			Thread thread = new Thread(() => {
+			var thread = new Thread(() => {
 				try {
 					action();
 				} catch (Exception e) {
@@ -251,15 +248,15 @@ namespace Sharer.Client {
 			try {
 				Cursor.Current = Cursors.WaitCursor;
 				SaveImageLocaly(image);
-				Task.Run(() => UploadPath(Sharer.LastUploadFilePath, this, token));
+				Task.Run(() => UploadPath(Sharer.LastUploadFilePath, this, token), token);
 			} catch (Exception ex) {
-				MessageBox.Show($"at UploadImage {ex.ToString()}");
+				MessageBox.Show($"at UploadImage {ex}");
 			} finally {
 				Cursor.Current = Cursors.Default;
 			}
 		}
 
-		private async void InitKeyHooks() {
+		private void InitKeyHooks() {
 			InterceptKeys.SetHooks(
 				CaptureScreen,          // Ctrl+Shift+2 @
 				CaptureArea,            // Ctrl+Shift+3 #
