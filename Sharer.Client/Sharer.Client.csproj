@@ -125,6 +125,7 @@
     <Compile Include="Forms\AreaSelectionForm.Designer.cs">
       <DependentUpon>AreaSelectionForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Infrastructure\ContextMenuItems.cs" />
     <Compile Include="Forms\EditCaptureForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -164,7 +165,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Sharer.cs" />
-    <Compile Include="Smth\WaterMarkTextBox.cs">
+    <Compile Include="Forms\WaterMarkTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
     <EmbeddedResource Include="Forms\AuthForm.resx">

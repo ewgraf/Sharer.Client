@@ -11,32 +11,21 @@ using Sharer.Client.Helpers;
 
 namespace Sharer.Client {
 	public partial class MainForm : Form {
+		public string lastLink;
 		private static Mutex _mutex;
+		private readonly UploadHistory _history = new UploadHistory();
+		private readonly Action _contextMenuUploadCancelled;
+		private readonly Action _contextMenuUploadFinished;
+		private readonly Icon _icon;
+		private CancellationTokenSource _uploadCancellationTokenSource;
 		private Account _account;
 		private AreaSelectionForm _selectionForm;
 		private OpenWithListener _openWithListener;
 		private string _openWithSharerFileUploadPath;
-		public string lastLink;
-		private UploadHistory _history = new UploadHistory();
-		private readonly Action _contextMenuUploadCancelled;
-		private readonly Action _contextMenuUploadFinished;
-		private CancellationTokenSource _uploadCancellationTokenSource;
 		private bool _uploading;
 
-		private readonly Icon _icon;
-
-		private class ContextMenuItems {
-			public const string Account = "Account";
-			public const string CaptureArea = "Capture area . . .";
-			public const string CaptureScreen = "Capture screen";
-			public const string Upload = "Upload . . .";
-			public const string History = "History";
-			public const string Cancel = "(cancel)";
-			public const string Settings = "Settings";
-			public const string Exit = "Exit";
-		}
-
 		public MainForm(string openWithSharerFileUploadPath, Mutex mutex) {
+
 			_openWithSharerFileUploadPath = openWithSharerFileUploadPath;
 			_openWithListener = new OpenWithListener();
 			_mutex = mutex;
@@ -116,22 +105,6 @@ namespace Sharer.Client {
 					;
 				}
 			};
-			//_showProgress = (string text) => {
-			//	//Task.Run(() => {
-			//		_showProgressToken = new CancellationTokenSource();
-			//		char[] progressChars = new[] { '-', '\\', '|', '/' };
-			//		int i = 0;
-			//		while (!_showProgressToken.IsCancellationRequested) {
-			//			this.notifyIcon1.ContextMenuStrip.Invoke(new Action<string>(UpdateProgressText), new object[] { $"{text}{progressChars[i++]}" });
-			//			if (i == progressChars.Length) {
-			//				i = 0;
-			//			}
-			//			this.notifyIcon1.ContextMenuStrip.Invalidate();
-			//			this.Invalidate();
-			//			Thread.Sleep(500);
-			//		}
-			//	//});
-			//};
 		}
 
 		#endregion
@@ -255,26 +228,30 @@ namespace Sharer.Client {
 			return tcs.Task;
 		}
 
+		private void SaveImageLocaly(Image image) {
+			string path = Directory.GetParent(Sharer.LastUploadFilePath).FullName;
+			if (!Directory.Exists(path)) {
+				Directory.CreateDirectory(path);
+			}
+			if (File.Exists(Sharer.LastUploadFilePath)) {
+				File.Delete(Sharer.LastUploadFilePath);
+				while (File.Exists(Sharer.LastUploadFilePath)) {
+					Thread.Sleep(5);
+				}
+			}
+			image.Save(Sharer.LastUploadFilePath);
+			image.Dispose();
+			while (FileHelper.IsLocked(Sharer.LastUploadFilePath)) {
+				Thread.Sleep(5);
+			}
+		}
+
 		// покрыть тестом большим файлом
 		private void UploadImage(Image image, CancellationToken token) {
 			try {
 				Cursor.Current = Cursors.WaitCursor;
-				string path = Directory.GetParent(Sharer.LastUploadFile).FullName;
-				if (!Directory.Exists(path)) {
-					Directory.CreateDirectory(path);
-				}
-				if (File.Exists(Sharer.LastUploadFile)) {
-					File.Delete(Sharer.LastUploadFile);
-					while (File.Exists(Sharer.LastUploadFile)) {
-						Thread.Sleep(5);
-					}
-				}
-				image.Save(Sharer.LastUploadFile);
-				image.Dispose();
-				while (FileHelper.IsLocked(Sharer.LastUploadFile)) {
-					Thread.Sleep(5);
-				}
-				Task.Run(() => UploadPath(Sharer.LastUploadFile, this, token));
+				SaveImageLocaly(image);
+				Task.Run(() => UploadPath(Sharer.LastUploadFilePath, this, token));
 			} catch (Exception ex) {
 				MessageBox.Show($"at UploadImage {ex.ToString()}");
 			} finally {
@@ -319,10 +296,15 @@ namespace Sharer.Client {
 
 		private void EditAndUploadIfChecked(Image image, Rectangle area, CancellationToken token) {
 			if (checkBox_EditBeforeUpload.Checked) {
-				var edit = new EditCaptureForm(image, area);
-				if (edit.ShowDialog() == DialogResult.OK) {
-					UploadImage(edit.Image, token);
-				}
+				image = image.Crop(area);
+				SaveImageLocaly(image);
+				ProcessStartInfo Info = new ProcessStartInfo() {
+					FileName = "mspaint.exe",
+					WindowStyle = ProcessWindowStyle.Normal,
+					Arguments = Sharer.LastUploadFilePath
+				};
+				Process.Start(Info).WaitForExit();
+				Task.Run(() => UploadPath(Sharer.LastUploadFilePath, this, token));
 			} else {
 				UploadImage(image, token);
 			}
@@ -384,7 +366,6 @@ namespace Sharer.Client {
 			_uploading = false;
 			this.notifyIcon1.Icon = _icon;
 		}
-
 
 		private async Task SelectAndUploadFiles(CancellationToken token) {
 			string[] selectedFiles = OpenSelectFilesDialog();
