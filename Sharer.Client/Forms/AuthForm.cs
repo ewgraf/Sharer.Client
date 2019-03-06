@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
-using Sharer.Client.Helpers;
 using Sharer.Client.Entities;
 
 namespace Sharer.Client {
 	public partial class AuthForm : Form {
+		private readonly Sharer _sharer;
+
 		public Account Account { get; private set; }
 
-		public AuthForm(Account account) {
+		public AuthForm(Sharer sharer, Account account) {
+			_sharer = sharer;
 			Account = account;
 
 			InitializeComponent();
@@ -65,7 +67,7 @@ namespace Sharer.Client {
 			this.checkBox_RememberMe.Enabled = false;
 			bool userExists = false;
 			try {
-				userExists = await NetHelper.TryAuthenticate(waterMarkTextBox_Email.Text, waterMarkTextBox_Password.Text);
+				userExists = await _sharer.TryAuthenticate(waterMarkTextBox_Email.Text, waterMarkTextBox_Password.Text);
 			} catch { }
 			if (userExists) {
 				this.BackColor = Color.Green;

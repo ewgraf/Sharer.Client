@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Sharer.Client.Entities;
-using Sharer.Client.Forms;
 using Sharer.Client.Helpers;
 
 namespace Sharer.Client {
@@ -23,9 +22,10 @@ namespace Sharer.Client {
 		private OpenWithListener _openWithListener;
 		private string _openWithSharerFileUploadPath;
 		private bool _uploading;
+		private readonly Sharer _sharer;
 
 		public MainForm(string openWithSharerFileUploadPath, Mutex mutex) {
-
+			_sharer = new Sharer();
 			_openWithSharerFileUploadPath = openWithSharerFileUploadPath;
 			_openWithListener = new OpenWithListener();
 			_mutex = mutex;
@@ -138,7 +138,7 @@ namespace Sharer.Client {
 
 		private Account TryAuth() {
 			var account = ConfigHelper.FindAccount();
-			using (var form = new AuthForm(account)) {
+			using (var form = new AuthForm(_sharer, account)) {
 				if (form.ShowDialog() != DialogResult.OK) {
 					return null;
 				}
@@ -193,7 +193,7 @@ namespace Sharer.Client {
 					throw new InvalidOperationException("Account was not found, try to relog");
 				}
 				
-				var result = await NetHelper.UploadPath(filePath, account, token);
+				var result = await _sharer.UploadPath(filePath, account, token);
 
 				if (result.Length > 0) {
 					if (result[0] == '-') {
@@ -292,8 +292,8 @@ namespace Sharer.Client {
 		}
 
 		private void EditAndUploadIfChecked(Image image, Rectangle area, CancellationToken token) {
+			image = image.Crop(area);
 			if (checkBox_EditBeforeUpload.Checked) {
-				image = image.Crop(area);
 				SaveImageLocaly(image);
 				ProcessStartInfo Info = new ProcessStartInfo() {
 					FileName = "mspaint.exe",
