@@ -15,11 +15,10 @@ using Microsoft.WindowsAPICodePack.Shell.PropertySystem;
 
 using Windows.UI.Notifications;
 using Windows.Data.Xml.Dom;
-using Sharer.Client.Infrastructure;
 using Sharer.Client.ShellHelpers;
 using IPersistFile = System.Runtime.InteropServices.ComTypes.IPersistFile;
 
-namespace Sharer.Client.Helpers {
+namespace Sharer.Client {
 	public class ToastHelper {
 		// In order to display toasts, a desktop application must have a shortcut on the Start menu.
 		// Also, an AppUserModelID must be set on that shortcut.
