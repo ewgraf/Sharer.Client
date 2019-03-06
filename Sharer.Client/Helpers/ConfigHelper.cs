@@ -1,22 +1,20 @@
-﻿using Sharer.Client.Entities;
-using System;
-using System.Configuration;
+﻿using System.Configuration;
 using System.IO;
 using System.Linq;
+using Sharer.Client.Entities;
 
 namespace Sharer.Client.Helpers {
 	public static class ConfigHelper {
 		private static Configuration GetConfiguration() {
-			string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-			string folder = Path.Combine(appdata, "sharer");
-			if (!Directory.Exists(folder)) {
-				Directory.CreateDirectory(folder);
-			}
-			string configPath = Path.Combine(folder, "sharer.config");
+			string configPath = Path.Combine(Sharer.MyDirectory, "sharer.exe.config");
 			if (!File.Exists(configPath)) {
 				File.WriteAllText(configPath,
 @"<?xml version=""1.0"" encoding=""utf-8""?>
 <configuration>
+    <appSettings>
+        <add key=""email"" value ="""" />
+        <add key=""password"" value ="""" />
+    </appSettings>
     <startup>
         <supportedRuntime version=""v4.0"" sku="".NETFramework,Version=v4.6.1"" />
     </startup>
@@ -41,6 +39,11 @@ namespace Sharer.Client.Helpers {
 			return config.AppSettings.Settings["email"].Value;
 		}
 
+		public static string GetPassword() {
+			var config = GetConfiguration();
+			return config.AppSettings.Settings["password"].Value;
+		}
+
 		public static void SetEmail(string email) {
 			var config = GetConfiguration();
 			if (config.AppSettings.Settings["email"].Value != email) {
@@ -48,11 +51,6 @@ namespace Sharer.Client.Helpers {
 				config.AppSettings.Settings.Add("email", email);
 				config.Save(ConfigurationSaveMode.Minimal);
 			}
-		}
-
-		public static string GetPassword() {
-			var config = GetConfiguration();
-			return config.AppSettings.Settings["password"].Value;
 		}
 
 		public static void SetPassword(string password) {
@@ -70,7 +68,7 @@ namespace Sharer.Client.Helpers {
 			if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password)) {
 				return null;
 			}
-			Account account = new Account {
+			var account = new Account {
 				Email = email,
 				Password = password,
 			};

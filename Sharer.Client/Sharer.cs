@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -11,7 +12,7 @@ using Sharer.Client.Entities;
 namespace Sharer.Client {
 	public class Sharer {
 		public const string Me = "Sharer";
-		public const string Version = "2";
+		public const string Version = "3";
 		public const string SharerFolder = "sharer";
 		public const string ExeFilename = "sharer.exe";
 		public const string LnkFilename = "sharer.lnk";
@@ -19,16 +20,15 @@ namespace Sharer.Client {
 		public const int MaxMb = 128;
 		public const int MaxFileSize = MaxMb * 1024 * 1024; // MaxMb Mb in bytes
 
-		public static bool FileSizeCorrect(string filePath) => new FileInfo(filePath).Length < MaxFileSize; // bytes to Mb
-		public static string MyDirectory => AppDomain.CurrentDomain.BaseDirectory;
-		public static string LastUploadFilePath => $@"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\sharer\last.jpg";
 		public static IPEndPoint EndPoint = new IPEndPoint(IPAddress.Loopback, Port);
-
+		public static string MyDirectory => AppDomain.CurrentDomain.BaseDirectory;
+		public static string LastUploadFilePath => Path.Combine(MyDirectory, "last.jpg");
+		public static bool FileSizeCorrect(string filePath) => new FileInfo(filePath).Length < MaxFileSize; // bytes to Mb
 
 		private readonly HttpClient _client = new HttpClient();
 
 		public Sharer() {
-
+			;
 		}
 
 		public async Task<string> UploadPath(string path, Account account, CancellationToken token) {

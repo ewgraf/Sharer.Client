@@ -10,23 +10,21 @@ using Sharer.Client.Helpers;
 
 namespace Sharer.Client {
 	public partial class MainForm : Form {
-		public string lastLink;
-		private static Mutex _mutex;
 		private readonly UploadHistory _history = new UploadHistory();
 		private readonly Action _contextMenuUploadCancelled;
 		private readonly Action _contextMenuUploadFinished;
 		private readonly Icon _icon;
+		private readonly Mutex _mutex;
+		private readonly Sharer _sharer;
 		private CancellationTokenSource _uploadCancellationTokenSource;
 		private Account _account;
 		private AreaSelectionForm _selectionForm;
 		private OpenWithListener _openWithListener;
 		private string _openWithSharerFileUploadPath;
 		private bool _uploading;
-		private readonly Sharer _sharer;
 
-		public MainForm(string openWithSharerFileUploadPath, Mutex mutex) {
+		public MainForm(Mutex mutex) {
 			_sharer = new Sharer();
-			_openWithSharerFileUploadPath = openWithSharerFileUploadPath;
 			_openWithListener = new OpenWithListener();
 			_mutex = mutex;
 
@@ -44,13 +42,16 @@ namespace Sharer.Client {
 			InitializeComponent();
 			_icon = this.notifyIcon1.Icon;
 			SetupCheckBoxEditBeforeUpload();
-
 			this.notifyIcon1.ContextMenuStrip = BuildContextMenuStrip();
 			SetupContextMenuStrip(
 				out _contextMenuUploadCancelled,
 				out _contextMenuUploadFinished
 			);
 			_uploadCancellationTokenSource = new CancellationTokenSource();
+		}
+
+		public MainForm(string openWithSharerFileUploadPath, Mutex mutex) : this(mutex) {
+			_openWithSharerFileUploadPath = openWithSharerFileUploadPath;
 		}
 
 		#region MainForm
@@ -119,6 +120,8 @@ namespace Sharer.Client {
 			}
 			//notifyIcon1.ShowBalloonTip(250, $"Good day, {_account.Email.Split('@')[0]}-san!", "Sharer is working in the background", ToolTipIcon.Info);
 
+			ToastHelper.TryCreateShortcut(Sharer.Me);
+
 			if (_openWithSharerFileUploadPath != null) {
 				await UploadPath(_openWithSharerFileUploadPath, this, CancellationToken.None);
 			}
@@ -150,16 +153,6 @@ namespace Sharer.Client {
 			return account;
 		}
 
-		public void SetClipboardAndShowToast(string filePath, string link) {
-			RunSTATask(() => {
-				Clipboard.SetText(link);
-			});
-			ToastHelper.ShowToast(link, filePath, (s, a) => {
-				if (link != null) {
-					Process.Start(link);
-				}
-			});
-		}
 
 		private Image TryOpenImage(string path) {
 			Image image = null;
@@ -173,7 +166,7 @@ namespace Sharer.Client {
 
 		public async Task UploadPath(string filePath, MainForm form, CancellationToken token) {
 			if (!Sharer.FileSizeCorrect(filePath)) {
-				MessageBox.Show($"Sorry, but uploading file '{filePath}' exceeds size limits of {Sharer.MaxMb}Mb");
+				MessageBox.Show($"Sorry, but uploading file '{filePath}'s size exceeds limits of {Sharer.MaxMb}Mb");
 				return;
 			}
 
@@ -199,9 +192,16 @@ namespace Sharer.Client {
 					if (result[0] == '-') {
 						throw new InvalidOperationException(result.Substring(1, result.Length - 1).Replace("\\n", Environment.NewLine));
 					}
-					result = $"{Sharer.Uris.SharerServer}/i/{result}";
-					form.SetClipboardAndShowToast(filePath, result);
-					_history.Add($"{result}{Path.GetExtension(filePath)}", TryOpenImage(filePath));
+					string link = $"{Sharer.Uris.SharerServer}/i/{result}";
+					RunSTATask(() => {
+						Clipboard.SetText(link);
+					});
+					ToastHelper.ShowToast(link, filePath, (s, a) => {
+						if (link != null) {
+							Process.Start(link);
+						}
+					});
+					_history.Add($"{link}{Path.GetExtension(filePath)}", TryOpenImage(filePath));
 					_contextMenuUploadFinished();
 				}
 			} catch (Exception ex) {

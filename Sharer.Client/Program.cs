@@ -3,6 +3,7 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Text;
 using System.Net.Sockets;
+using System.Linq;
 
 namespace Sharer.Client {
 	public static class Program {
@@ -10,34 +11,30 @@ namespace Sharer.Client {
 		private static Mutex _mutex = new Mutex(true, MutexName);
 
 		/// <summary>
-		/// The main entry point for the application.
+		///     The main entry point for the application.
 		/// </summary>
 		[STAThread]
 		static void Main(string[] args) {
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 
-			//args = new[] { @"C:\Users\Ewgraf\Downloads\img\14807056194942.jpg" };
-			//args = new[] { @"C:\Users\Ewgraf\Downloads\img\IMG_14022017_204823.png" };
-			//System.Drawing.Bitmap image = new System.Drawing.Bitmap(args[0]);
-			//Application.Run(new Forms.EditCaptureForm(image, new System.Drawing.Point(100, 100)));
-			//return;
-
-			string filePath = null;
-			if (args.Length == 1) {
-				filePath = args[0];
-				//MessageBox.Show($"args[0]: {args[0]}");
-			}
+			string filePath = args.SingleOrDefault();
 
 			if (_mutex.WaitOne(TimeSpan.Zero, true)) {
 				try {
-					Application.Run(new MainForm(filePath, _mutex)); // filePath = null || filePath
+					MainForm form;
+					if (filePath != null) {
+						form = new MainForm(filePath, _mutex);
+					} else {
+						form = new MainForm(_mutex);
+					}
+					Application.Run(form);
 				} finally {
 					_mutex.ReleaseMutex();
 				}
 			} else if (filePath != null) {
 				try {
-					using (TcpClient client = new TcpClient()) {
+					using (var client = new TcpClient()) {
 						client.Connect(Sharer.EndPoint);
 						NetworkStream networkStream = client.GetStream();
 						byte[] message = Encoding.UTF8.GetBytes(filePath);

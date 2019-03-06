@@ -1,22 +1,12 @@
-﻿using Windows.UI.Notifications;
-using Microsoft.Toolkit.Uwp.Notifications;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Windows.Forms;
 using Windows.Data.Xml.Dom;
 using Windows.Foundation;
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Windows;
-using MS.WindowsAPICodePack.Internal;
-using Microsoft.WindowsAPICodePack.Shell.PropertySystem;
-
 using Windows.UI.Notifications;
-using Windows.Data.Xml.Dom;
+using Microsoft.WindowsAPICodePack.Shell.PropertySystem;
+using MS.WindowsAPICodePack.Internal;
 using Sharer.Client.ShellHelpers;
-using IPersistFile = System.Runtime.InteropServices.ComTypes.IPersistFile;
 
 namespace Sharer.Client {
 	public class ToastHelper {
@@ -28,21 +18,18 @@ namespace Sharer.Client {
 		//
 		// Included in this project is a wxs file that be used with the WiX toolkit
 		// to make an installer that creates the necessary shortcut. One or the other should be used.
-		private bool TryCreateShortcut(string appId)
-		{
-			String shortcutPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Microsoft\\Windows\\Start Menu\\Programs\\Desktop Toasts Sample CS.lnk";
-			if (!File.Exists(shortcutPath))
-			{
+		public static bool TryCreateShortcut(string appId) {
+			string shortcutPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Microsoft\\Windows\\Start Menu\\Programs\\Sharer.lnk";
+			if (!File.Exists(shortcutPath)) {
 				InstallShortcut(shortcutPath, appId);
 				return true;
 			}
 			return false;
 		}
 
-		private void InstallShortcut(String shortcutPath, string appId)
-		{
+		private static void InstallShortcut(string shortcutPath, string appId) {
 			// Find the path to the current executable
-			String exePath = Process.GetCurrentProcess().MainModule.FileName;
+			string exePath = Process.GetCurrentProcess().MainModule.FileName;
 			IShellLinkW newShortcut = (IShellLinkW)new CShellLink();
 
 			// Create a shortcut to the exe
@@ -64,91 +51,60 @@ namespace Sharer.Client {
 			ErrorHelper.VerifySucceeded(newShortcutSave.Save(shortcutPath, true));
 		}
 
+		// Create and show the toast.
+		// See the "Toasts" sample for more detail on what can be done with toasts
 		public static void ShowToast(string link, string imagePath, TypedEventHandler<ToastNotification, object> onActivated) {
-			var toastContent = new ToastContent {
-				//Launch = link,
-				Visual = new ToastVisual {
-					BindingGeneric = new ToastBindingGeneric {
-						//AppLogoOverride = new ToastGenericAppLogo {
-						//	Source = $"file:///{imagePath}",
-						//	HintCrop = ToastGenericAppLogoCrop.None
-						//},
-						Children = {
-							new AdaptiveText {
-								Text = $"Uploaded at {link}"
-							}
-						}
-					}
-				},
-
-				//Actions = new ToastActionsCustom()
-				//{
-					
-				//},
-
-			};
-			
-			//var q = ToastNotificationManager.GetDefault().GetToastCollectionManager().;
-			XmlDocument toastXml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastImageAndText03);
-			//// Fill in the text elements
-			//XmlNodeList stringElements = toastXml.GetElementsByTagName("text");
-			//stringElements[0].AppendChild(toastXml.CreateTextNode("Uploaded at"));
-			//stringElements[1].AppendChild(toastXml.CreateTextNode(link));
-
-			//// Specify the absolute path to an image
-			//XmlNodeList imageElements = toastXml.GetElementsByTagName("image");
-			//imageElements[0].Attributes.GetNamedItem("src").NodeValue = "file:///" + imagePath;
-
+			// Get a toast XML template
+			XmlDocument toastXml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastImageAndText02);
+			// Fill in the text elements
+			XmlNodeList stringElements = toastXml.GetElementsByTagName("text");
+			stringElements[0].AppendChild(toastXml.CreateTextNode("Uploaded at"));
+			stringElements[1].AppendChild(toastXml.CreateTextNode(link));
+			// Specify the absolute path to an image
+			XmlNodeList imageElements = toastXml.GetElementsByTagName("image");
+			string fileImagePath = $"file:///{imagePath}";
+			imageElements[0].Attributes.GetNamedItem("src").NodeValue = fileImagePath;
 			// Create the toast and attach event listeners
-			string content = toastContent.GetContent();
-			var xmlContent = new XmlDocument();
-			xmlContent.LoadXml(content);
-			var toast = new ToastNotification(xmlContent);
+			ToastNotification toast = new ToastNotification(toastXml);
 			toast.Activated += onActivated;
-			toast.Failed += (o, a) => {
-				MessageBox.Show($"{o}{Environment.NewLine}{a}");
-			};
-
-			///////////////////////////////////////////////////////////////
-			var toastContent2 = new ToastContent()
-			{
-				Scenario = ToastScenario.Default,
-				Visual = new ToastVisual
-				{
-					BindingGeneric = new ToastBindingGeneric
-					{
-						Children =
-						{
-							new AdaptiveText
-							{
-								Text = "New toast notification (BackgroundTaskHelper)."
-							}
-						}
-					}
-				}
-			};
-
-			// Create & show toast notification
-
-			xmlContent = new XmlDocument();
-			xmlContent.LoadXml(toastContent2.GetContent());
-			var toastNotification = new ToastNotification(xmlContent);
-			ToastNotificationManager.CreateToastNotifier("Sharer").Show(toastNotification);
-			///////////////////////////////////////////////////////////////
-
-			// Show the toast. Be sure to specify the AppUserModelId
-			// on your application's shortcut!
-			try
-			{
-				ToastNotificationManager.CreateToastNotifier("Sharer").Show(toast);
-			}
-			catch (Exception ex)
-			{
-				;
-			}
-
-			;
+			//toast.Dismissed
+			//toast.Failed
+			// Create & show toast notification.
+			// Be sure to specify the AppUserModelId on your application's shortcut!
+			ToastNotificationManager.CreateToastNotifier(Sharer.Me).Show(toast);
 		}
+
+		//private void ToastActivated(ToastNotification sender, object e) {
+		//	Dispatcher.Invoke(() => {
+		//		Activate();
+		//		Output.Text = "The user activated the toast.";
+		//	});
+		//}
+
+		//private void ToastDismissed(ToastNotification sender, ToastDismissedEventArgs e) {
+		//	String outputText = "";
+		//	switch (e.Reason) {
+		//		case ToastDismissalReason.ApplicationHidden:
+		//			outputText = "The app hid the toast using ToastNotifier.Hide";
+		//			break;
+		//		case ToastDismissalReason.UserCanceled:
+		//			outputText = "The user dismissed the toast";
+		//			break;
+		//		case ToastDismissalReason.TimedOut:
+		//			outputText = "The toast has timed out";
+		//			break;
+		//	}
+
+		//	Dispatcher.Invoke(() => {
+		//		Output.Text = outputText;
+		//	});
+		//}
+
+		//private void ToastFailed(ToastNotification sender, ToastFailedEventArgs e) {
+		//	Dispatcher.Invoke(() => {
+		//		Output.Text = "The toast encountered an error.";
+		//	});
+		//}
 
 		public static void ShowToast(string title, string message) {
 			XmlDocument toastXml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastImageAndText03);
