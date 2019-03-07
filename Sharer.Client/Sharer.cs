@@ -95,8 +95,6 @@ namespace Sharer.Client {
 			return _client.PostAsync(uri, content, token).Result;
 		}
 
-		
-
 		public string Base64Encode(string data) {
 			var dataBytes = Encoding.UTF8.GetBytes(data);
 			return Convert.ToBase64String(dataBytes);
@@ -116,6 +114,8 @@ namespace Sharer.Client {
 			if (responce.StatusCode == HttpStatusCode.OK) {
 				return true;
 			} else if (responce.StatusCode == HttpStatusCode.NotFound) {
+				return false;
+			} else if (responce.StatusCode == HttpStatusCode.NotAcceptable) {
 				return false;
 			} else {
 				throw new InvalidOperationException($"Unexpected authentication responce status code: {responce.StatusCode}");
