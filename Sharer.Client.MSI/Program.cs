@@ -8,7 +8,8 @@ namespace Sharer.Client.MSI {
 			var project = new Project("Sharer",
 				new Dir(@"%ProgramFiles%\Sharer",
 					new File($@"{prefix}\sharer.exe", 
-						new FileShortcut("Sharer", @"%AppData%\Microsoft\Windows\Start Menu\Programs")
+						new FileShortcut("Sharer", @"%AppData%\Microsoft\Windows\Start Menu\Programs"),
+						new FileShortcut("Sharer", @"%Startup%")
 					),
 					new File($@"{prefix}\sharer.exe.config"),
 					new File($@"{prefix}\Microsoft.WindowsAPICodePack.dll"),
@@ -16,11 +17,13 @@ namespace Sharer.Client.MSI {
 				)
 			);
 
-			project.GUID = new Guid("56628ce2-91ad-464c-a005-a19e09a5c9a2");
+			project.BackgroundImage = "sharer-background.jpg";
+			project.ControlPanelInfo.Comments = "Sharer is a program for uploading and sharing screenshots & files.";
+			project.ControlPanelInfo.HelpLink = "https://sharer.su";
 			project.ControlPanelInfo.Manufacturer = "http://github.com/ewgraf";
-			project.ControlPanelInfo.
+			project.ControlPanelInfo.ProductIcon = @"..\Sharer.Client\sharerIcon4.ico";
+			project.GUID = new Guid("56628ce2-91ad-464c-a005-a19e09a5c9a2");
 			project.LicenceFile = "Licence.rtf";
-			project.BackgroundImage = "sharer-banner.jpg";
 			project.Version = new Version(3, 0);
 
 			Compiler.BuildMsi(project);

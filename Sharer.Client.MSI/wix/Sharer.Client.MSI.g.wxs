@@ -6,7 +6,7 @@
 </auto-generated>
 -->
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Product Id="56628ce2-91ad-464c-a005-a19e19a5c9a3" Name="Sharer" Language="1033" Codepage="Windows-1252" Version="1.0.0.0" UpgradeCode="56628ce2-91ad-464c-a005-a19e09a5c9a2" Manufacturer="Lenovo">
+  <Product Id="56628ce2-91ad-464c-a005-a19e39b5c9a2" Name="Sharer" Language="1033" Codepage="Windows-1252" Version="3.0" UpgradeCode="56628ce2-91ad-464c-a005-a19e09a5c9a2" Manufacturer="http://github.com/ewgraf">
     <Package InstallerVersion="200" Compressed="yes" SummaryCodepage="Windows-1252" Languages="1033" />
     <Media Id="1" Cabinet="Sharer.cab" EmbedCab="yes" />
 
@@ -17,6 +17,7 @@
           <Component Id="Component.sharer.exe_1714803173" Guid="56628ce2-91ad-464c-a005-a19ead72079e">
             <File Id="sharer.exe_1714803173" Source="..\Sharer.Client\bin\Release\sharer.exe">
               <Shortcut Id="Shortcut.sharer.exe_1714803173.Sharer__" WorkingDirectory="INSTALLDIR" Directory="AppDataFolder.Microsoft.Windows.Start_Menu.Programs" Name="Sharer.lnk" />
+              <Shortcut Id="Shortcut.sharer.exe_1714803173.Sharer.1" WorkingDirectory="INSTALLDIR" Directory="StartupFolder" Name="Sharer.lnk" />
             </File>
 
             <RegistryKey Root="HKCU" Key="Software\WixSharp\Used">
@@ -89,13 +90,37 @@
 
         </Directory>
       </Directory>
+
+      <Directory Id="StartupFolder" Name="StartupFolder">
+
+        <Component Id="Component.StartupFolder.EmptyDirectory" Guid="56628ce2-91ad-464c-a005-a19ec28ca83f">
+          <CreateFolder />
+
+          <RegistryKey Root="HKCU" Key="Software\WixSharp\Used">
+            <RegistryValue Value="0" Type="string" KeyPath="yes" />
+          </RegistryKey>
+        </Component>
+
+      </Directory>
+
+      <Component Id="TARGETDIR" Guid="56628ce2-91ad-464c-a005-a19e7c753915" KeyPath="yes">
+        <CreateFolder />
+        <RemoveFolder Id="TARGETDIR" On="uninstall" />
+      </Component>
+
     </Directory>
 
-    <WixVariable Id="WixUIBannerBmp" Value="sharer-banner.jpg" />
+    <Icon Id="app_icon.ico" SourceFile="..\Sharer.Client\sharerIcon4.ico" />
+
+    <WixVariable Id="WixUIDialogBmp" Value="sharer-background.jpg" />
     <WixVariable Id="WixUILicenseRtf" Value="Licence.rtf" />
 
     <UIRef Id="WixUI_Minimal" />
     <UIRef Id="WixUI_ErrorProgressText" />
+
+    <Property Id="ARPCOMMENTS" Value="Sharer is a program for uploading and sharing screenshots &amp; files." />
+    <Property Id="ARPHELPLINK" Value="https://sharer.su" />
+    <Property Id="ARPPRODUCTICON" Value="app_icon.ico" />
 
     <Feature Id="Complete" Title="Complete" Absent="allow" Level="1">
       <ComponentRef Id="Component.sharer.exe_1714803173" />
@@ -103,9 +128,11 @@
       <ComponentRef Id="Component.Microsoft.WindowsAPICodePack.dll_1396871292" />
       <ComponentRef Id="Component.Microsoft.WindowsAPICodePack.Shell.dll_1267489223" />
       <ComponentRef Id="Component.AppDataFolder.Microsoft.Windows.Start_Menu.Programs.EmptyDirectory" />
+      <ComponentRef Id="Component.StartupFolder.EmptyDirectory" />
       <ComponentRef Id="AppDataFolder.Microsoft.Windows.Start_Menu" />
       <ComponentRef Id="AppDataFolder.Microsoft.Windows" />
       <ComponentRef Id="AppDataFolder.Microsoft" />
+      <ComponentRef Id="TARGETDIR" />
     </Feature>
 
   </Product>
