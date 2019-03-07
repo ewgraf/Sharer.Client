@@ -199,6 +199,7 @@
 			this.checkBox_EditBeforeUpload.TabIndex = 0;
 			this.checkBox_EditBeforeUpload.Text = "Edit before upload";
 			this.checkBox_EditBeforeUpload.UseVisualStyleBackColor = true;
+			this.checkBox_EditBeforeUpload.CheckedChanged += new System.EventHandler(this.checkBox_EditBeforeUpload_CheckedChanged);
 			// 
 			// MainForm
 			// 

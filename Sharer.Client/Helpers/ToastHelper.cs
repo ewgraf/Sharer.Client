@@ -20,11 +20,11 @@ namespace Sharer.Client {
 		// to make an installer that creates the necessary shortcut. One or the other should be used.
 		public static bool TryCreateShortcut(string appId) {
 			string shortcutPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Microsoft\\Windows\\Start Menu\\Programs\\Sharer.lnk";
-			if (!File.Exists(shortcutPath)) {
-				InstallShortcut(shortcutPath, appId);
-				return true;
+			if (File.Exists(shortcutPath)) {
+				File.Delete(shortcutPath);
 			}
-			return false;
+			InstallShortcut(shortcutPath, appId);
+			return true;
 		}
 
 		private static void InstallShortcut(string shortcutPath, string appId) {

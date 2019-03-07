@@ -6,6 +6,7 @@ namespace Sharer.Client.Entities {
 		public bool RememberMe { get; set; }
 		public string Email { get; set; }
 		public string Password { get; set; }
+		public string EditBeforeUpload { get; set; }
 		public string ServerAdress { get; set; }
 
 		public override string ToString() {

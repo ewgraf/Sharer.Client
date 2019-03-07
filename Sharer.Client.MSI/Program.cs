@@ -6,7 +6,7 @@ namespace Sharer.Client.MSI {
 		public static void Main(string[] args) {
 			string prefix = @"..\Sharer.Client\bin\Release";
 			var project = new Project("Sharer",
-				new Dir(@"%ProgramFiles%\Sharer",
+				new Dir(@"%AppData%\Sharer",
 					new File($@"{prefix}\sharer.exe", 
 						new FileShortcut("Sharer", @"%AppData%\Microsoft\Windows\Start Menu\Programs"),
 						new FileShortcut("Sharer", @"%Startup%")

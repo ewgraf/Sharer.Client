@@ -27,6 +27,8 @@ namespace Sharer.Client {
 			_sharer = new Sharer();
 			_openWithListener = new OpenWithListener();
 			_mutex = mutex;
+			_uploadCancellationTokenSource = new CancellationTokenSource();
+			ToastHelper.TryCreateShortcut(Sharer.Me);
 
 			// start listener in separate thread
 			Task.Run(() => _openWithListener.Start(filePath => {
@@ -41,13 +43,11 @@ namespace Sharer.Client {
 
 			InitializeComponent();
 			_icon = this.notifyIcon1.Icon;
-			SetupCheckBoxEditBeforeUpload();
 			this.notifyIcon1.ContextMenuStrip = BuildContextMenuStrip();
 			SetupContextMenuStrip(
 				out _contextMenuUploadCancelled,
 				out _contextMenuUploadFinished
 			);
-			_uploadCancellationTokenSource = new CancellationTokenSource();
 		}
 
 		public MainForm(string openWithSharerFileUploadPath, Mutex mutex) : this(mutex) {
@@ -118,9 +118,9 @@ namespace Sharer.Client {
 				Application.Exit();
 				return;
 			}
+			SetupCheckBoxEditBeforeUpload();
+			this.checkBox_EditBeforeUpload.Checked = bool.Parse(_account.EditBeforeUpload);
 			//notifyIcon1.ShowBalloonTip(250, $"Good day, {_account.Email.Split('@')[0]}-san!", "Sharer is working in the background", ToolTipIcon.Info);
-
-			ToastHelper.TryCreateShortcut(Sharer.Me);
 
 			if (_openWithSharerFileUploadPath != null) {
 				await UploadPath(_openWithSharerFileUploadPath, this, CancellationToken.None);
@@ -146,13 +146,13 @@ namespace Sharer.Client {
 					return null;
 				}
 				account = form.Account;
+				account.EditBeforeUpload = ConfigHelper.GetEditBeforeUpload();
 			}
 			if (account.RememberMe) {
 				ConfigHelper.SetAccount(account);
 			}
 			return account;
 		}
-
 
 		private Image TryOpenImage(string path) {
 			Image image = null;
@@ -225,16 +225,13 @@ namespace Sharer.Client {
 			return tcs.Task;
 		}
 
-		private void SaveImageLocaly(Image image) {
+		private void SaveLastImage(Image image) {
 			string path = Directory.GetParent(Sharer.LastUploadFilePath).FullName;
 			if (!Directory.Exists(path)) {
 				Directory.CreateDirectory(path);
 			}
 			if (File.Exists(Sharer.LastUploadFilePath)) {
-				File.Delete(Sharer.LastUploadFilePath);
-				while (File.Exists(Sharer.LastUploadFilePath)) {
-					Thread.Sleep(5);
-				}
+				DeleteLastImage();
 			}
 			image.Save(Sharer.LastUploadFilePath);
 			image.Dispose();
@@ -243,11 +240,18 @@ namespace Sharer.Client {
 			}
 		}
 
+		private void DeleteLastImage() {
+			File.Delete(Sharer.LastUploadFilePath);
+			while (File.Exists(Sharer.LastUploadFilePath)) {
+				Thread.Sleep(5);
+			}
+		}
+
 		// покрыть тестом большим файлом
 		private void UploadImage(Image image, CancellationToken token) {
 			try {
 				Cursor.Current = Cursors.WaitCursor;
-				SaveImageLocaly(image);
+				SaveLastImage(image);
 				Task.Run(() => UploadPath(Sharer.LastUploadFilePath, this, token), token);
 			} catch (Exception ex) {
 				MessageBox.Show($"at UploadImage {ex}");
@@ -258,9 +262,9 @@ namespace Sharer.Client {
 
 		private void InitKeyHooks() {
 			InterceptKeys.SetHooks(
-				CaptureScreen,          // Ctrl+Shift+2 @
-				CaptureArea,            // Ctrl+Shift+3 #
-				SelectAndUploadFiles,   // Ctrl+Shift+6 ^
+				CaptureScreen,        // Ctrl+Shift+2 @
+				CaptureArea,          // Ctrl+Shift+3 #
+				SelectAndUploadFiles, // Ctrl+Shift+6 ^
 				_uploadCancellationTokenSource.Token
 			);
 		}
@@ -294,7 +298,7 @@ namespace Sharer.Client {
 		private void EditAndUploadIfChecked(Image image, Rectangle area, CancellationToken token) {
 			image = image.Crop(area);
 			if (checkBox_EditBeforeUpload.Checked) {
-				SaveImageLocaly(image);
+				SaveLastImage(image);
 				ProcessStartInfo Info = new ProcessStartInfo() {
 					FileName = "mspaint.exe",
 					WindowStyle = ProcessWindowStyle.Normal,
@@ -466,6 +470,11 @@ namespace Sharer.Client {
 
 		private void linkLabelEmail_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
 			Process.Start(Sharer.Uris.AccountPage);
+		}
+
+		private void checkBox_EditBeforeUpload_CheckedChanged(object sender, EventArgs e) {
+			_account.EditBeforeUpload = this.checkBox_EditBeforeUpload.Checked.ToString();
+			ConfigHelper.SetEditBeforeUpload(this.checkBox_EditBeforeUpload.Checked.ToString());
 		}
 	}
 }

@@ -14,7 +14,8 @@ namespace Sharer.Client.Helpers {
     <appSettings>
         <add key=""email"" value ="""" />
         <add key=""password"" value ="""" />
-    </appSettings>
+        <add key=""editBeforeUpload"" value=""true"" />
+	</appSettings>
     <startup>
         <supportedRuntime version=""v4.0"" sku="".NETFramework,Version=v4.6.1"" />
     </startup>
@@ -31,6 +32,10 @@ namespace Sharer.Client.Helpers {
 				config.AppSettings.Settings.Add("password", string.Empty);
 				config.Save(ConfigurationSaveMode.Minimal);
 			}
+			if (!config.AppSettings.Settings.AllKeys.Contains("editBeforeUpload")) {
+				config.AppSettings.Settings.Add("editBeforeUpload", true.ToString());
+				config.Save(ConfigurationSaveMode.Minimal);
+			}
 			return config;
 		}
 
@@ -42,6 +47,11 @@ namespace Sharer.Client.Helpers {
 		public static string GetPassword() {
 			var config = GetConfiguration();
 			return config.AppSettings.Settings["password"].Value;
+		}
+
+		public static string GetEditBeforeUpload() {
+			var config = GetConfiguration();
+			return config.AppSettings.Settings["editBeforeUpload"].Value;
 		}
 
 		public static void SetEmail(string email) {
@@ -62,15 +72,26 @@ namespace Sharer.Client.Helpers {
 			}
 		}
 
+		public static void SetEditBeforeUpload(string editBeforeUpload) {
+			var config = GetConfiguration();
+			if (config.AppSettings.Settings["editBeforeUpload"].Value != editBeforeUpload) {
+				config.AppSettings.Settings.Remove("editBeforeUpload");
+				config.AppSettings.Settings.Add("editBeforeUpload", editBeforeUpload);
+				config.Save(ConfigurationSaveMode.Minimal);
+			}
+		}
+
 		public static Account FindAccount() {
 			string email = GetEmail();
 			string password = GetPassword();
+			string editBeforeUpload = GetEditBeforeUpload();
 			if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password)) {
 				return null;
 			}
 			var account = new Account {
 				Email = email,
 				Password = password,
+				EditBeforeUpload = editBeforeUpload
 			};
 			return account;
 		}
@@ -78,12 +99,14 @@ namespace Sharer.Client.Helpers {
 		public static void SetAccount(Account account) {
 			SetEmail(account.Email);
 			SetPassword(account.Password);
+			SetEditBeforeUpload(account.EditBeforeUpload);
 		}
 
 		public static void ClearAccount() {
 			SetAccount(new Account {
 				Email = string.Empty,
 				Password = string.Empty,
+				EditBeforeUpload = true.ToString()
 			});
 		}
 	}
