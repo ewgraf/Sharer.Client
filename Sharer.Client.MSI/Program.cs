@@ -17,6 +17,11 @@ namespace Sharer.Client.MSI {
 			);
 
 			project.GUID = new Guid("56628ce2-91ad-464c-a005-a19e09a5c9a2");
+			project.ControlPanelInfo.Manufacturer = "http://github.com/ewgraf";
+			project.ControlPanelInfo.
+			project.LicenceFile = "Licence.rtf";
+			project.BackgroundImage = "sharer-banner.jpg";
+			project.Version = new Version(3, 0);
 
 			Compiler.BuildMsi(project);
 		}

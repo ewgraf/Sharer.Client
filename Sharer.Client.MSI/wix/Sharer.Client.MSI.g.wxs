@@ -91,6 +91,9 @@
       </Directory>
     </Directory>
 
+    <WixVariable Id="WixUIBannerBmp" Value="sharer-banner.jpg" />
+    <WixVariable Id="WixUILicenseRtf" Value="Licence.rtf" />
+
     <UIRef Id="WixUI_Minimal" />
     <UIRef Id="WixUI_ErrorProgressText" />
 
