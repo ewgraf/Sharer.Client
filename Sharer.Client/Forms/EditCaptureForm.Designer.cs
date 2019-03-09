@@ -54,7 +54,6 @@
 			// 
 			this.buttonDrawRectangle.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.buttonDrawRectangle.BackColor = System.Drawing.Color.White;
-			this.buttonDrawRectangle.BackgroundImage = global::Sharer.Client.Properties.Resources.Red_rectangle;
 			this.buttonDrawRectangle.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
 			this.buttonDrawRectangle.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
 			this.buttonDrawRectangle.Location = new System.Drawing.Point(76, 215);
@@ -68,7 +67,6 @@
 			// 
 			this.buttonDrawArrow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.buttonDrawArrow.BackColor = System.Drawing.Color.White;
-			this.buttonDrawArrow.BackgroundImage = global::Sharer.Client.Properties.Resources.Red_arrow;
 			this.buttonDrawArrow.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
 			this.buttonDrawArrow.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
 			this.buttonDrawArrow.Location = new System.Drawing.Point(12, 215);

@@ -114,6 +114,35 @@
 
       </Directory>
 
+      <Directory Id="ProgramFilesFolder" Name="ProgramFilesFolder">
+
+        <Component Id="Registry.1" Guid="56628ce2-91ad-464c-a005-a19e06c29721" KeyPath="yes">
+          <RegistryKey Root="HKCR" Key="*\shell\Share">
+            <RegistryValue Id="RegValue" Type="string" KeyPath="no" Value="Share" />
+          </RegistryKey>
+
+          <CreateFolder />
+          <RemoveFolder Id="ProgramFilesFolder" On="uninstall" />
+        </Component>
+
+        <Component Id="Registry.2" Guid="56628ce2-91ad-464c-a005-a19e06c39721">
+          <RegistryKey Root="HKCR" Key="*\shell\Share">
+            <RegistryValue Id="Icon" Type="string" KeyPath="yes" Value="[INSTALLDIR]sharer.exe" Name="Icon" />
+          </RegistryKey>
+
+          <CreateFolder />
+        </Component>
+
+        <Component Id="Registry.3" Guid="56628ce2-91ad-464c-a005-a19e06c49721">
+          <RegistryKey Root="HKCR" Key="*\shell\Share\command">
+            <RegistryValue Id="RegValue.1" Type="expandable" KeyPath="yes" Value="&quot;[INSTALLDIR]sharer.exe&quot; &quot;%1&quot;" />
+          </RegistryKey>
+
+          <CreateFolder />
+        </Component>
+
+      </Directory>
+
       <Component Id="TARGETDIR" Guid="56628ce2-91ad-464c-a005-a19e7c753915" KeyPath="yes">
         <CreateFolder />
         <RemoveFolder Id="TARGETDIR" On="uninstall" />
@@ -121,7 +150,7 @@
 
     </Directory>
 
-    <Icon Id="app_icon.ico" SourceFile="..\Sharer.Client\sharerIcon4.ico" />
+    <Icon Id="app_icon.ico" SourceFile="..\Sharer.Client\sharerIcon6.ico" />
 
     <WixVariable Id="WixUIDialogBmp" Value="sharer-background.jpg" />
     <WixVariable Id="WixUILicenseRtf" Value="Licence.rtf" />
@@ -140,6 +169,9 @@
       <ComponentRef Id="Component.Microsoft.WindowsAPICodePack.Shell.dll_1946266280" />
       <ComponentRef Id="Component.AppDataFolder.Microsoft.Windows.Start_Menu.Programs.EmptyDirectory" />
       <ComponentRef Id="Component.StartupFolder.EmptyDirectory" />
+      <ComponentRef Id="Registry.1" />
+      <ComponentRef Id="Registry.2" />
+      <ComponentRef Id="Registry.3" />
       <ComponentRef Id="AppDataFolder.Microsoft.Windows.Start_Menu" />
       <ComponentRef Id="AppDataFolder.Microsoft.Windows" />
       <ComponentRef Id="AppDataFolder.Microsoft" />
