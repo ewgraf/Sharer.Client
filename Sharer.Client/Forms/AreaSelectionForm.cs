@@ -14,20 +14,22 @@ namespace Sharer.Client {
 		public AreaSelectionForm() {
 			InitializeComponent();
 
-			// to make form almost invisible, but still clickable
-			this.BackColor = Color.Black;
-			this.Opacity = 0.005d;
+			this.WindowState = FormWindowState.Normal;
+			this.StartPosition = FormStartPosition.Manual;
 			this.TopMost = true;
 			this.Cursor = Cursors.Cross;
 			this.ShowInTaskbar = false;
+			// to make form almost invisible, but still clickable
+			this.BackColor = Color.Black;
+			this.Opacity = 0.005d;
 		}
 
 		private void Form2_Load(object sender, EventArgs e) {
-			//this.ShowInTaskbar = false;
-			//this.LostFocus += Form2_LostFocus;
+			this.Location = new Point(SystemInformation.VirtualScreen.Left, SystemInformation.VirtualScreen.Top);
+			this.Size = new Size(SystemInformation.VirtualScreen.Width, SystemInformation.VirtualScreen.Height);
 
 			_drawingRectangleMode = true;
-			_drawingRectangleNow = false;            
+			_drawingRectangleNow = false;
             
 			SelectedRectangle = new Rectangle();
             

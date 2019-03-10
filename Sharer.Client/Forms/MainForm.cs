@@ -282,16 +282,16 @@ namespace Sharer.Client {
 			}
 			if (result == DialogResult.OK) {
 				Rectangle selected = _selectionForm.SelectedRectangle;
-				if (selected == Rectangle.Empty) {
+				if (selected.Width == 0 || selected.Height == 0) {
 					return;
 				}
-				Image screenshot = ScreenCaptureHelper.CaptureScreen();
+				Image screenshot = ScreenCaptureHelper.CaptureScreens();
 				EditAndUploadIfChecked(screenshot, selected, token);
 			}
 		}
 
 		private void CaptureScreen(CancellationToken token) {
-			Image image = ScreenCaptureHelper.CaptureScreen();
+			Image image = ScreenCaptureHelper.CaptureScreens();
 			UploadImage(image, token);
 		}
 
