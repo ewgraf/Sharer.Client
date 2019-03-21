@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -17,19 +16,12 @@ namespace Sharer.Client {
 		public const string ExeFilename = "sharer.exe";
 		public const string LnkFilename = "sharer.lnk";
 		public const int Port = 42000;
-		public const int MaxMb = 128;
-		public const int MaxFileSize = MaxMb * 1024 * 1024; // MaxMb Mb in bytes
 
 		public static IPEndPoint EndPoint = new IPEndPoint(IPAddress.Loopback, Port);
 		public static string MyDirectory => AppDomain.CurrentDomain.BaseDirectory;
 		public static string LastUploadFilePath => Path.Combine(MyDirectory, "last.jpg");
-		public static bool FileSizeCorrect(string filePath) => new FileInfo(filePath).Length < MaxFileSize; // bytes to Mb
 
 		private readonly HttpClient _client = new HttpClient();
-
-		public Sharer() {
-			;
-		}
 
 		public async Task<string> UploadPath(string path, Account account, CancellationToken token) {
 			if (string.IsNullOrEmpty(path)) {
@@ -50,7 +42,7 @@ namespace Sharer.Client {
 					var content = new MultipartFormDataContent("sharerClientBoundaryString");
 					content.Add(new StreamContent(stream), "file", Path.GetFileName(path));
 
-					response = POST($"{Sharer.Uris.SharerServer}/account/apiupload", content, account, token);
+					response = POST($"{Uris.SharerServer}/account/apiupload", content, account, token);
 					if (token.IsCancellationRequested) {
 						return null;
 					}
@@ -59,16 +51,19 @@ namespace Sharer.Client {
 						// TODO: Logout
 					}
 					if (response.IsSuccessStatusCode) {
-						result = await response.Content.ReadAsStringAsync(); // ["xraXn"]
+						// ["xraXn"]
+						// ["xraXn", ""]
+						// -OutOfMemoryException
+						result = await response.Content.ReadAsStringAsync();
+						if (result[0] == '-') {
+							if (result.Contains("OutOfMemoryException")) {
+								return result;
+							}
+							continue;
+						}
 						result = result.Substring(2, result.Length - 4);
 						result = result.Replace("\"", string.Empty);
 						if (result == "null") {
-							continue;
-						}
-						if (result[0] == '-') {
-							if (result.Contains("free space")) {
-								return result;
-							}
 							continue;
 						}
 						return result;

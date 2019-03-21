@@ -165,11 +165,6 @@ namespace Sharer.Client {
 		}
 
 		public async Task UploadPath(string filePath, MainForm form, CancellationToken token) {
-			if (!Sharer.FileSizeCorrect(filePath)) {
-				MessageBox.Show($"Sorry, but uploading file '{filePath}'s size exceeds limits of {Sharer.MaxMb}Mb");
-				return;
-			}
-
 			try {
 				string size = new FileInfo(filePath).Length.ToInformationPrefixString();
 				StartDisplayProgress(size);
