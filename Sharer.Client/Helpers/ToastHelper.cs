@@ -39,8 +39,7 @@ namespace Sharer.Client {
 			// Open the shortcut property store, set the AppUserModelId property
 			IPropertyStore newShortcutProperties = (IPropertyStore)newShortcut;
 
-			using (PropVariant appIdProperty = new PropVariant(appId))
-			{
+			using (PropVariant appIdProperty = new PropVariant(appId)) {
 				ErrorHelper.VerifySucceeded(newShortcutProperties.SetValue(SystemProperties.System.AppUserModel.ID, appIdProperty));
 				ErrorHelper.VerifySucceeded(newShortcutProperties.Commit());
 			}
