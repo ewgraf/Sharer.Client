@@ -14,10 +14,10 @@
       <Directory Id="AppDataFolder" Name="AppDataFolder">
         <Directory Id="INSTALLDIR" Name="Sharer">
 
-          <Component Id="Component.sharer.exe_2125320629" Guid="56628ce2-91ad-464c-a005-a19e4613c2e2">
-            <File Id="sharer.exe_2125320629" Source="..\Sharer.Client\bin\Release\sharer.exe">
-              <Shortcut Id="Shortcut.sharer.exe_2125320629.Sharer__" WorkingDirectory="INSTALLDIR" Directory="AppDataFolder.Microsoft.Windows.Start_Menu.Programs" Name="Sharer.lnk" />
-              <Shortcut Id="Shortcut.sharer.exe_2125320629.Sharer.1" WorkingDirectory="INSTALLDIR" Directory="StartupFolder" Name="Sharer.lnk" />
+          <Component Id="Component.sharer.exe_1136896308" Guid="56628ce2-91ad-464c-a005-a19eef406b34">
+            <File Id="sharer.exe_1136896308" Source="..\Sharer.Client\bin\Debug\sharer.exe">
+              <Shortcut Id="Shortcut.sharer.exe_1136896308.Sharer__" WorkingDirectory="INSTALLDIR" Directory="AppDataFolder.Microsoft.Windows.Start_Menu.Programs" Name="Sharer.lnk" />
+              <Shortcut Id="Shortcut.sharer.exe_1136896308.Sharer.1" WorkingDirectory="INSTALLDIR" Directory="StartupFolder" Name="Sharer.lnk" />
             </File>
             <RemoveFolder Id="INSTALLDIR" On="uninstall" />
 
@@ -26,24 +26,24 @@
             </RegistryKey>
           </Component>
 
-          <Component Id="Component.sharer.exe.config_1128719953" Guid="56628ce2-91ad-464c-a005-a19ef543cd55">
-            <File Id="sharer.exe.config_1128719953" Source="..\Sharer.Client\bin\Release\sharer.exe.config" />
+          <Component Id="Component.sharer.exe.config_2143776709" Guid="56628ce2-91ad-464c-a005-a19e421bdd2c">
+            <File Id="sharer.exe.config_2143776709" Source="..\Sharer.Client\bin\Debug\sharer.exe.config" />
 
             <RegistryKey Root="HKCU" Key="Software\WixSharp\Used">
               <RegistryValue Value="0" Type="string" KeyPath="yes" />
             </RegistryKey>
           </Component>
 
-          <Component Id="Component.Microsoft.WindowsAPICodePack.dll_366431590" Guid="56628ce2-91ad-464c-a005-a19e46abbda7">
-            <File Id="Microsoft.WindowsAPICodePack.dll_366431590" Source="..\Sharer.Client\bin\Release\Microsoft.WindowsAPICodePack.dll" />
+          <Component Id="Component.Microsoft.WindowsAPICodePack.dll_1177872724" Guid="56628ce2-91ad-464c-a005-a19e864db26b">
+            <File Id="Microsoft.WindowsAPICodePack.dll_1177872724" Source="..\Sharer.Client\bin\Debug\Microsoft.WindowsAPICodePack.dll" />
 
             <RegistryKey Root="HKCU" Key="Software\WixSharp\Used">
               <RegistryValue Value="0" Type="string" KeyPath="yes" />
             </RegistryKey>
           </Component>
 
-          <Component Id="Component.Microsoft.WindowsAPICodePack.Shell.dll_1946266280" Guid="56628ce2-91ad-464c-a005-a19eb22853bb">
-            <File Id="Microsoft.WindowsAPICodePack.Shell.dll_1946266280" Source="..\Sharer.Client\bin\Release\Microsoft.WindowsAPICodePack.Shell.dll" />
+          <Component Id="Component.Microsoft.WindowsAPICodePack.Shell.dll_460486602" Guid="56628ce2-91ad-464c-a005-a19e3c83f8e3">
+            <File Id="Microsoft.WindowsAPICodePack.Shell.dll_460486602" Source="..\Sharer.Client\bin\Debug\Microsoft.WindowsAPICodePack.Shell.dll" />
 
             <RegistryKey Root="HKCU" Key="Software\WixSharp\Used">
               <RegistryValue Value="0" Type="string" KeyPath="yes" />
@@ -163,10 +163,10 @@
     <Property Id="ARPPRODUCTICON" Value="app_icon.ico" />
 
     <Feature Id="Complete" Title="Complete" Absent="allow" Level="1">
-      <ComponentRef Id="Component.sharer.exe_2125320629" />
-      <ComponentRef Id="Component.sharer.exe.config_1128719953" />
-      <ComponentRef Id="Component.Microsoft.WindowsAPICodePack.dll_366431590" />
-      <ComponentRef Id="Component.Microsoft.WindowsAPICodePack.Shell.dll_1946266280" />
+      <ComponentRef Id="Component.sharer.exe_1136896308" />
+      <ComponentRef Id="Component.sharer.exe.config_2143776709" />
+      <ComponentRef Id="Component.Microsoft.WindowsAPICodePack.dll_1177872724" />
+      <ComponentRef Id="Component.Microsoft.WindowsAPICodePack.Shell.dll_460486602" />
       <ComponentRef Id="Component.AppDataFolder.Microsoft.Windows.Start_Menu.Programs.EmptyDirectory" />
       <ComponentRef Id="Component.StartupFolder.EmptyDirectory" />
       <ComponentRef Id="Registry.1" />

@@ -4,7 +4,8 @@ using WixSharp;
 namespace Sharer.Client.MSI {
 	public class Script {
 		public static void Main(string[] args) {
-			string prefix = @"..\Sharer.Client\bin\Release";
+			Compiler.WixLocation = @"..\packages\WixSharp.wix.bin.3.11.0\tools\bin";
+			string prefix = @"..\Sharer.Client\bin\Debug";
 			var project = new Project("Sharer",
 				new Dir(@"%AppData%\Sharer",
 					new File($@"{prefix}\sharer.exe", 
