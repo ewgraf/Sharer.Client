@@ -44,5 +44,9 @@ namespace Sharer.Client.Helpers {
 			}
 			return target;
 		}
+
+		public static Rectangle GetBounds(this Image image) {
+			return new Rectangle(0, 0, image.Width, image.Height);
+		}
 	}
 }

@@ -286,8 +286,8 @@ namespace Sharer.Client {
 		}
 
 		private void CaptureScreen(CancellationToken token) {
-			Image image = ScreenCaptureHelper.CaptureScreens();
-			UploadImage(image, token);
+			Image screenshot = ScreenCaptureHelper.CaptureScreens();
+			EditAndUploadIfChecked(screenshot, screenshot.GetBounds(), token);
 		}
 
 		private void EditAndUploadIfChecked(Image image, Rectangle area, CancellationToken token) {

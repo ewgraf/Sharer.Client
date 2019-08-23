@@ -118,8 +118,8 @@ namespace Sharer.Client {
 		}
 
 		public static class Uris {
-			//public const string SharerServer = "http://sharer.su";
-			public const string SharerServer = "http://localhost:56706";
+			public const string SharerServer = "https://sharer.su";
+			//public const string SharerServer = "http://localhost:56706";
 			public static string AuthToken = $"{SharerServer}/token";
 			public static string AccountPage = $"{SharerServer}/account";
 			public static string Auth = $"{SharerServer}/api/user/auth";
