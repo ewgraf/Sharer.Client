@@ -54,18 +54,6 @@ namespace Sharer.Client {
 			_openWithSharerFileUploadPath = openWithSharerFileUploadPath;
 		}
 
-		#region MainForm
-
-		private void SetupCheckBoxEditBeforeUpload() {
-			new ToolTip {
-				ShowAlways = true,
-				InitialDelay = 1,
-				AutoPopDelay = 10000
-			}.SetToolTip(this.checkBox_EditBeforeUpload, $@"'Edit' form will be shown before uploading");
-		}
-
-		#endregion
-
 		#region ContextMenuStrip
 
 		private ContextMenuStrip BuildContextMenuStrip() {
@@ -111,22 +99,34 @@ namespace Sharer.Client {
 		#endregion
 
 		private async void Form1_Load(object sender, EventArgs e) {
-			notifyIcon1_MouseClick(sender, new MouseEventArgs(MouseButtons.Right, 0, 0, 0, 0));
-			this.WindowState = FormWindowState.Minimized;
-			this.ShowInTaskbar = false;
 			if (!Auth()) {
 				Application.Exit();
 				return;
 			}
-			SetupCheckBoxEditBeforeUpload();
+
+			// togeather
+			this.WindowState = FormWindowState.Minimized;
+			this.ShowInTaskbar = false;
+
+			InterceptKeys.SetHooks(
+				CaptureScreen,        // Ctrl+Shift+2 @
+				CaptureArea,          // Ctrl+Shift+3 #
+				SelectAndUploadFiles, // Ctrl+Shift+6 ^
+				_uploadCancellationTokenSource.Token
+			);
+			// notifyIcon1_MouseClick(sender, new MouseEventArgs(MouseButtons.Right, 0, 0, 0, 0));
+			
 			this.checkBox_EditBeforeUpload.Checked = bool.Parse(_account.EditBeforeUpload);
-			//notifyIcon1.ShowBalloonTip(250, $"Good day, {_account.Email.Split('@')[0]}-san!", "Sharer is working in the background", ToolTipIcon.Info);
+			new ToolTip {
+				ShowAlways = true,
+				InitialDelay = 1,
+				AutoPopDelay = 10000
+			}.SetToolTip(this.checkBox_EditBeforeUpload, $@"'Edit' form will be shown before uploading");
+			notifyIcon1.ShowBalloonTip(250, $"Good day, {_account.Email.Split('@')[0]}!", "Sharer is working in the background.", ToolTipIcon.Info);
 
 			if (_openWithSharerFileUploadPath != null) {
 				await UploadPath(_openWithSharerFileUploadPath, this, CancellationToken.None);
 			}
-
-			InitKeyHooks();
 		}
 
 		private bool Auth() {
@@ -253,15 +253,6 @@ namespace Sharer.Client {
 			} finally {
 				Cursor.Current = Cursors.Default;
 			}
-		}
-
-		private void InitKeyHooks() {
-			InterceptKeys.SetHooks(
-				CaptureScreen,        // Ctrl+Shift+2 @
-				CaptureArea,          // Ctrl+Shift+3 #
-				SelectAndUploadFiles, // Ctrl+Shift+6 ^
-				_uploadCancellationTokenSource.Token
-			);
 		}
 
 		private void CaptureArea(CancellationToken token) {

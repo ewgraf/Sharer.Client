@@ -4,7 +4,7 @@ using WixSharp;
 namespace Sharer.Client.MSI {
 	public class Script {
 		public static void Main(string[] args) {
-			Compiler.WixLocation = @"..\packages\WixSharp.wix.bin.3.11.0\tools\bin";
+			Compiler.WixLocation = Environment.ExpandEnvironmentVariables(@"%HOMEPATH%\.nuget\packages\wixsharp.wix.bin\3.11.2\tools\bin");
 			string prefix = @"..\Sharer.Client\bin\Debug";
 			var project = new Project("Sharer",
 				new Dir(@"%AppData%\Sharer",
